@@ -1,0 +1,259 @@
+@extends('layout')
+
+@push('head_scripts')
+	<meta name="csrf-token" content="{{ csrf_token() }}">
+@endpush
+@push('body_scripts')
+	<script data-cfasync="false" src="{{ asset('js/cart.js') }}"></script>
+@endpush
+@section('content')
+	<div class="flex flex-col  max-w-[80%] m-auto">
+		<form method="POST" action="{{route('invoices.store')}}" autocomplete="nop">
+			@csrf
+			<div class="flex flex-row justify-between">
+				@foreach ($statuses as $status)
+					@if (preg_match("(Draft|Completed|Paid)", $status->name) === 1)
+						<button type="submit" class="text-white {{ $status->color }}-700 hover:{{ $status->color }}-800 focus:ring-4 focus:outline-none focus:{{ $status->color }}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 w-[250px]" name="status" value="{{ $status->id }}">
+							<span class="material-symbols-outlined">{{ $status->icon }}</span>{{ $status->name }}
+						</button>
+					@endif
+				@endforeach
+				<button type="submit" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none w-[250px] focus:bg-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2" name="status" value="cancel">
+					<span class="material-symbols-outlined">cancel</span>Cancel
+				</button>
+			</div>
+
+			<h2 class="border-b-2 border-gray-700 text-lg p-3 font-medium my-3 ">Company Information</h2>
+			<div class="flex flex-row m-3 mb-5">
+				<x-forms.select name="company" label="Company" :data="$companies" icon="apartment" />
+				<x-forms.select name="user" label="Salesperson" :data="$salespeople" icon="group" class="w-[200px]"/>
+			</div>
+
+			<h2 class="border-b-2 border-gray-700 text-lg p-3 font-medium">Customer Information</h2>
+			<div class="flex flex-col mb-2" x-data="invoice">
+				<div class="flex flex-row m-3">
+					<div class="relative w-fit mx-3 flex-grow">
+						<label for="customer" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
+						<div class="flex">
+							<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md material-symbols-outlined">
+								person
+							</span>
+							<input type="search" name="name" id="customer" x-bind:value="current_customer.name" @input.debounce="searchCustomers" @blur.debounce="unselect" @focus.debounce="searchCustomers" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5" autocomplete="nop">
+						</div>
+						@error('name')
+							{{ $message }}
+						@enderror
+						<div class="absolute top-10 left-0 right-0 mt-8" x-show="show_suggestions">
+							<ul>
+								<template x-for="customer in customer_list">
+									<li class="cursor-pointer hover:bg-blue-700 border-b-2 last:border-b-0 border-green-700 bg-blue-300 last:rounded-b-lg" x-text="customer.name" @click="selectCustomer(customer.id)"></li>
+								</template>
+							</ul>
+						</div>
+					</div>
+					<x-forms.input-bind name="email" label="Email" type="search" model="current_customer" icon="alternate_email" />
+					<x-forms.input-bind name="phone" label="Phone" type="search" model="current_customer" icon="android_dialer" />
+				</div>
+				<div class="m-3">
+					<x-forms.input-bind name="address" label="Address" type="search" model="current_customer" icon="home" />
+				</div>
+				<div class="flex flex-row m-3">
+					<x-forms.input-bind name="province" label="Province" type="search" model="current_customer" icon="map" class="flex-grow" />
+					<x-forms.input-bind name="country" label="Country" type="search" model="current_customer" icon="public" class="flex-grow" />
+					<x-forms.select name="tax_region" label="Tax Region" :data="$tax_regions" icon="payments" @change="searchTax"/>
+				</div>
+			
+
+			<h2 class="border-b-2 border-gray-700 text-lg p-3 font-medium">Invoice Cart</h2>
+			<div class="flex flex-col">
+				<input type="hidden" name="payload" x-bind:value="invoice_cart" value=""></input>
+				@error('payload')
+					{{ $message }}
+				@enderror
+				@error('description', 'cart')
+					{{ $message }}
+				@enderror
+				@error('price', 'cart')
+					{{ $message }}
+				@enderror
+				@error('quantity', 'cart')
+					{{ $message }}
+				@enderror
+				<table class="md:table w-full">
+					<thead>
+						<tr x-on:keydown.prevent.enter="">
+							<td><input type="text" placeholder="Enter Description" class="border-2 border-gray-100 my-2 mx-1 p-1" x-model="new_cart_row.description" @keyup.enter="addCartRow" id="input_description"/></td>
+							<td><input type="number" placeholder="Enter Price" class="border-2 border-gray-100 my-2 mx-1 p-1" x-model="new_cart_row.price" @keyup.enter="addCartRow" /></td>
+							<td><input type="text" placeholder="Enter Discount ($ or %)" class="border-2 border-gray-100 my-2 mx-1 p-1" x-model="new_cart_row.discount" @keyup.enter="addCartRow" /></td>
+							<td><input type="number" placeholder="Enter Quantity" class="border-2 border-gray-100 my-2 mx-1 p-1" x-model="new_cart_row.quantity" @keyup.enter="addCartRow" /></td>
+							<td><p x-text="twoDigitString(calculateTotal(new_cart_row.price, new_cart_row.discount, new_cart_row.quantity))" class="before:content-['$'] my-2 mx-1 p-1 text-right"></p></td>
+							<td></td>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th>Description</th>
+							<th>Price</th>
+							<th>Discount</th>
+							<th>Quantity</th>
+							<th>Total</th>
+							<th>Delete</th>
+						</tr>
+						<template x-for="cart_row in cart" x-effect="updateJson()">
+							<tr x-on:keydown.prevent.enter="" :key="cart_row.id" >
+								<td><input type="text" class="border-2 border-gray-100 mx-1 p-1" x-model="cart_row.description" :value="cart_row.description" /></td>
+								<td><input type="number" class="border-2 border-gray-100 mx-1 p-1" x-model="cart_row.price" /></td>
+								<td><input type="text" class="border-2 border-gray-100 mx-1 p-1" x-model="cart_row.discount" /></td>
+								<td><input type="number" class="border-2 border-gray-100 mx-1 p-1" x-model="cart_row.quantity" /></td>
+								<td><p x-text="twoDigitString(calculateTotal(cart_row.price, cart_row.discount, cart_row.quantity))" class="before:content-['$'] mx-1 p-1 text-right"></p></td>
+								<td><button type="button" @click="removeCartRow(cart_row)">X</button></td>
+							</tr>
+						</template>
+						<tr>
+							<td>Gross Total</td>
+							<td><p x-text="money(grossTotal())"></p></td>
+						</tr>
+						<tr>
+							<td>Shipping & Handling</td>
+							<td><input type="text" name="shipping_handling" x-model="shipping_handling" /></td>
+						</tr>
+						<tr>
+							<td>Invoice Discount</td>
+							<td><input type="text" name="invoice_discount" placeholder="$ or %" x-model="invoice_discount" /></td>
+						</tr>
+						<template x-for="tax in taxes" :key="tax.name">
+							<tr>
+								<td><p x-text="tax.name + ' (' + (tax.value * 100) + '%)'"></p></td>
+								<td><p x-text="grossTotal() * tax.value"></p></td>
+							</tr>
+						</template>
+						<tr>
+							<td>Before Tax</td>
+							<td><p x-text="money(beforeTax())"></p></td>
+						</tr>
+						<tr>
+							<td>NET TOTAL</td>
+							<td><p x-text="money(netTotal())"></p></td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			</div>
+			<h2 class="border-b-2 border-gray-700 text-lg p-3 mb-2 font-medium">Notes</h2>
+			<textarea class="border-2 border-gray-300 rounded p-3 my-3 w-full" type="text" rows="10" placeholder="Enter notes here."></textarea>
+		</form>
+	</div>
+
+{{--
+	  <label for="website-admin" class="block mb-2 text-sm font-medium text-gray-900 dark:text-gray-300">Username</label>
+<div class="flex">
+  <span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md dark:bg-gray-600 dark:text-gray-400 dark:border-gray-600">
+    @
+  </span>
+  <input type="text" id="website-admin" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Bonnie Green">
+</div>
+ 				<button disabled type="button" class="  cursor-not-allowed text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800 inline-flex items-center">
+					<svg role="status" class="inline w-4 h-4 mr-3 text-white animate-spin" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+					<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="#E5E7EB"/>
+					<path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentColor"/>
+					</svg>
+					Loading...
+				</button> --}}
+{{-- {{ $customers }} --}}
+@endsection
+
+{{-- 
+<table class="flex w-full flex-col text-left text-sm md:table md:table-fixed">
+  <thead>
+    <tr x-on:keydown.prevent.enter="">
+      <td><input type="text" placeholder="Enter Description" class="my-2 mx-1 w-full border-b-2 border-gray-400 bg-gray-100 p-1" x-model="new_cart_row.description" @keyup.enter="addCartRow" id="input_description" /></td>
+      <td class="w-2/12"><input type="number" placeholder="Enter Price" class="my-2 mx-1 w-full border-b-2 border-gray-400 bg-gray-100 p-1" x-model="new_cart_row.price" @keyup.enter="addCartRow" /></td>
+      <td class="w-2/12"><input type="text" placeholder="Enter Discount ($ or %)" class="my-2 mx-1 w-full border-b-2 border-gray-400 bg-gray-100 p-1" x-model="new_cart_row.discount" @keyup.enter="addCartRow" /></td>
+      <td class="w-[10%]"><input type="number" placeholder="Enter Quantity" class="my-2 mx-1 w-full border-b-2 border-gray-400 bg-gray-100 p-1" x-model="new_cart_row.quantity" @keyup.enter="addCartRow" /></td>
+      <td class="w-[13%]" colspan=""><p x-text="twoDigitString(calculateTotal(new_cart_row.price, new_cart_row.discount, new_cart_row.quantity))" class="my-2 mx-1 p-1 text-right text-lg font-medium before:content-['$']">300000.21</p></td>
+      <td class="w-[8%]"></td>
+    </tr>
+  </thead>
+  <thead class="hidden bg-gray-50 text-xs uppercase md:table-header-group md:text-gray-700">
+    <tr class="md:table-row md:border-b-2">
+      <th scope="col" class="table-cell px-4 py-3">Description</th>
+      <th scope="col" class="table-cell px-4 py-3">Price</th>
+      <th scope="col" class="table-cell px-4 py-3">Discount</th>
+      <th scope="col" class="table-cell px-4 py-3">Quantity</th>
+      <th scope="col" class="table-cell px-4 py-3 text-right">Total</th>
+      <th scope="col" class="table-cell px-4 py-3">Delete</th>
+    </tr>
+  </thead>
+  <tbody class="contents md:table-row-group">
+    <tr class="mb-3 grid grid-cols-2 rounded-lg border-2 border-b border-gray-100 bg-white shadow-md md:mb-0 md:table-row md:rounded-none md:border-0 md:p-0 md:px-0 md:shadow-none last:md:border-b-4 last:md:border-gray-500 md:even:bg-gray-100 md:hover:bg-gray-200">
+      <td class="flex flex-col px-2 py-2 md:table-cell md:text-lg">
+        <input type="text" class="w-full border-b-2 border-gray-400 bg-gray-100 p-1" x-model="cart_row.description" :value="cart_row.description" />
+      </td>
+      <td class="flex flex-col px-2 py-2 md:table-cell md:text-lg">
+        <input type="number" class="w-full border-b-2 border-gray-400 bg-gray-100 p-1 text-right" x-model="cart_row.price" />
+      </td>
+      <td class="flex flex-col px-2 py-2 md:table-cell md:text-lg">
+        <input type="text" class="w-full border-b-2 border-gray-400 bg-gray-100 p-1 text-right" x-model="cart_row.discount" />
+      </td>
+      <td class="flex flex-col px-2 py-2 md:table-cell md:text-lg">
+        <input type="number" class="w-full border-b-2 border-gray-400 bg-gray-100 p-1 text-center" x-model="cart_row.quantity" />
+      </td>
+      <td class="flex flex-col px-2 py-2 md:table-cell md:text-lg">
+        <p x-text="twoDigitString(calculateTotal(cart_row.price, cart_row.discount, cart_row.quantity))" class="p-1 text-right before:content-['$']">300000.21</p>
+      </td>
+      <td class="flex flex-col text-center md:table-cell md:text-lg">
+        <button class="w-7 rounded-lg bg-gray-500 text-white" type="button" @click="removeCartRow(cart_row)">X</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<div class="flex flex-row justify-end">
+  <table class="grid grid-cols-2 text-left text-sm md:table md:w-1/2 md:table-fixed xl:w-5/12">
+    <tbody class="contents md:table-row-group">
+      <tr class="contents border-b-2 hover:bg-gray-200 md:table-row">
+        <th scope="row" class="col-span-2 mx-5 w-1/2 text-right text-lg font-medium">Gross Total</th>
+        <td class="col-span-2 px-4 text-right text-xl md:table-cell">
+          <span class="float-left mr-5 px-5 text-right">$</span>
+          <p x-text="money(grossTotal())">$447.00</p>
+        </td>
+      </tr>
+      <tr class="contents hover:bg-gray-200 md:table-row">
+        <th scope="row" class="col-span-2 mx-5 w-1/2 text-right text-lg font-medium">Shipping &amp; Handling</th>
+        <td class="col-span-2 px-4 text-right text-xl md:table-cell">
+          <input class="border-b-2 border-gray-400 bg-gray-100 text-right" type="number" name="shipping_handling" x-model="shipping_handling" placeholder="Enter S&H" />
+        </td>
+      </tr>
+      <tr class="contents hover:bg-gray-200 md:table-row">
+        <th scope="row" class="col-span-2 mx-5 w-1/2 text-right text-lg font-medium">Invoice Discount</th>
+        <td class="col-span-2 px-4 text-right text-xl md:table-cell">
+          <input class="border-b-2 border-gray-400 bg-gray-100 text-right" type="text" name="invoice_discount" placeholder="$ or %" x-model="invoice_discount" />
+        </td>
+      </tr>
+      <tr class="contents border-b-2 hover:bg-gray-200 md:table-row">
+        <th scope="row" class="col-span-2 mx-5 w-1/2 text-right text-lg font-medium">Before Tax</th>
+        <td class="col-span-2 px-4 text-right text-xl md:table-cell">
+          <span class="float-left mr-5 px-5 text-right">$</span>
+          <p x-text="money(beforeTax())">$0.00</p>
+        </td>
+      </tr>
+      <tr class="contents hover:bg-gray-200 md:table-row">
+        <th scope="row" class="col-span-2 mx-5 w-1/2 text-right text-lg font-medium"><p x-text="tax.name + ' (' + (tax.value * 100) + '%)'">GST (5.00%)</p></th>
+        <td class="col-span-2 px-4 text-right text-xl md:table-cell">22.35</td>
+      </tr>
+      <tr class="contents hover:bg-gray-200 md:table-row">
+        <th scope="row" class="col-span-2 mx-5 w-1/2 text-right text-lg font-medium"><p x-text="tax.name + ' (' + (tax.value * 100) + '%)'">PST (7.00%)</p></th>
+        <td class="col-span-2 px-4 text-right text-xl md:table-cell">31.29</td>
+      </tr>
+      <tr class="contents border-y-2 border-double border-gray-700 text-2xl font-semibold hover:bg-gray-200 md:table-row">
+        <th scope="row" class="col-span-2 mx-5 w-1/2 text-right uppercase">Net Total</th>
+        <td class="col-span-2 px-4 text-right md:table-cell">
+          <span class="float-left mr-5 px-5 text-right">$</span>
+          <p>100000.00</p>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+	
+	
+--}}

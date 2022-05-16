@@ -1,0 +1,88 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Invoice extends Model
+{
+    use HasFactory;
+
+	protected $fillable = [
+		'invoice_number',
+		'company_id',
+		'status_id',
+		'salesperson_id',
+		'customer_id',
+		'completed_at',
+		'paid_at'
+    ];
+
+	public function status      () { return $this->belongsTo (Status     ::class, 'status_id'     ); }
+	public function company     () { return $this->belongsTo (Company    ::class, 'company_id'    ); }
+	public function user        () { return $this->belongsTo (User       ::class, 'salesperson_id'); }
+	public function customer    () { return $this->belongsTo (Customer   ::class, 'customer_id'   ); }
+	public function invoice_row () { return $this->hasMany   (InvoiceRow ::class                  ); }
+
+	public function scopeFilter($query, array $filters) {
+		//dd($query->where('invoice_number', '=', request('query'))->orWhere('notes', 'like', '%'.request('query').'%')->get());
+		//dd(InvoiceRow::where('description', 'like', '%et%')->leftJoin('invoices', 'invoice_id', '=', 'invoices.id')->select('invoices.*')->get());
+		if ($filters['query'] ?? false) {
+			$query->where('invoice_number', request('query'))
+					//->orWhere('description', 'like', '%'.request('query').'%')
+					->orWhere('notes', 'like', '%'.request('query').'%')
+					->union(InvoiceRow::where('description', 'like', '%'.request('query').'%')->leftJoin('invoices', 'invoice_id', '=', 'invoices.id')->select('invoices.*'));
+		}
+		if ($filters['salesperson_id'] ?? false) {
+			$query->where('salesperson_id', request('salesperson_id'));
+		}
+		if ($filters['customer_id'] ?? false) {
+			$query->where('customer_id', request('customer_id'));
+		}
+		if ($filters['company_id'] ?? false) {
+			$query->where('company_id', request('company_id'));
+		}
+		if ($filters['status_id'] ?? false) {
+			$query->where('status_id', request('status_id'));
+		}
+	}
+
+	public function getRouteKeyName()
+	{
+		return 'invoice_number';
+	}
+
+	private function discount($gross_total) {
+		$discountValue = (float)preg_match('/[0-9]+\.?[0-9]+/', $this->discount_string, $out) ? $out[0] : 0.00;
+		if (str_contains($this->discount_string, '%')) {
+			return $gross_total * (1 - $discountValue/100);
+		} else {
+			return $gross_total - $discountValue;
+		}
+	}
+
+	public function getGrossTotalAttribute() {
+		$total = 0;
+		foreach ($this->invoice_row as $row) {
+			$total += $row->total;
+		}
+		return $total;
+	}
+
+	public function getBeforeTaxAttribute() {
+		return $this->discount($this->_gross_total + ($this->shipping_handling ?? 0.00));
+	}
+
+	public function getTaxTotalAttribute() {
+		$tax = 0.00;
+		foreach ($this->customer->tax as $taxes) {
+			$tax += $taxes->value;
+		}
+		return $tax;
+	}
+
+	public function getNetTotalAttribute() {
+		return $this->before_tax * (1 + $this->tax_total);
+	}
+}

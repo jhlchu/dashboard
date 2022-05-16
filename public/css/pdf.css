@@ -1,0 +1,10 @@
+.wrapper {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+	border: 1px black solid;
+}
+.header {
+	display: flex;
+	flex-direction: row;
+}
