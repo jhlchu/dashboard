@@ -207,9 +207,6 @@ class InvoiceController extends Controller
 			'line2' => 'By signing below, I (purchaser) have agreed with the sales policy, and confirmed the accuracy of this
 					sales invoice.'
 		];
-		
-		
-
 
 
 		$customer = $invoice->customer;
