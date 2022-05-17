@@ -6,7 +6,9 @@
 @section('content')
 
 <div class="flex flex-row justify-around p-3 md:justify-center">
-	<a href="{{route('invoices.pdf', ['invoice'=> $invoice] )}}">To PDF</a>
+
+
+	<a class="text-white bg-yellow-700 hover:bg-yellow-800 focus:ring-4 focus:outline-none focus:bg-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 w-[100px]" href="{{route('invoices.pdf', ['invoice'=> $invoice] )}}">To PDF</a>
 	<button class="m-1 mx-1 flex-grow basis-1/3 rounded border-2 py-1 px-3 text-base font-medium text-gray-700 hover:bg-yellow-500 hover:text-white md:flex-grow-0 md:basis-1/5">PDF</button>
 	@if ($invoice->status->name === 'Deleted')
 		<button class="m-1 mx-1 flex-grow basis-1/3 rounded border-2 py-1 px-3 text-base font-medium text-gray-700 hover:bg-blue-500 hover:text-white md:flex-grow-0 md:basis-1/5">Restore</button>
