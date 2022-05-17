@@ -15,7 +15,7 @@ Route::get('/calculator', fn() => view('calculator') );
 
 
 Route::post('/invoices/{invoice}', [InvoiceController::class, 'show_post'])->name('invoices.show_post');
-Route::get('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
+Route::post('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
 Route::resources([
     'invoices'  => InvoiceController ::class,
     'customers' => CustomerController::class,

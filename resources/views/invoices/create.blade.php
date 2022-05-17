@@ -13,7 +13,7 @@
 			<div class="flex flex-row justify-between">
 				@foreach ($statuses as $status)
 					@if (preg_match("(Draft|Completed|Paid)", $status->name) === 1)
-						<button type="submit" class="text-white {{ $status->color }}-700 hover:{{ $status->color }}-800 focus:ring-4 focus:outline-none focus:{{ $status->color }}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 w-[250px]" name="status" value="{{ $status->id }}">
+						<button type="submit" class="text-white bg-{{ $status->color }}-700 hover:bg-{{ $status->color }}-800 focus:ring-4 focus:outline-none focus:bg-{{ $status->color }}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 w-[250px]" name="status" value="{{ $status->id }}">
 							<span class="material-symbols-outlined">{{ $status->icon }}</span>{{ $status->name }}
 						</button>
 					@endif

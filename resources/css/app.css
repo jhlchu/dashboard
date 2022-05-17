@@ -10,7 +10,6 @@
 
 @layer utilities {
 
-
 	.table-stripes:nth-of-type(2n)>td {
 		@apply bg-gray-100;
 	}
@@ -18,8 +17,6 @@
 	[x-cloak] {
 		display: none;
 	}
-
-
 
 	.duration-300 {
 		transition-duration: 300ms;
@@ -41,7 +38,7 @@
 		transform: scale(1);
 	}
 }
-
+/* 
 .bg-blue-500 {
 	--tw-bg-opacity: 1;
 	background-color: rgb(63 131 248/var(--tw-bg-opacity));
@@ -62,3 +59,4 @@
 	--tw-bg-opacity: 1;
 	background-color: rgb(14 159 110/var(--tw-bg-opacity));
 }
+*/

@@ -3,6 +3,13 @@ const colors = require('tailwindcss/colors');
 //const { red, green, blue, gray, purple, } = require('tailwindcss/colors')
 
 module.exports = {
+	safelist: [
+		{ pattern: /bg-red-.+/ },
+		{ pattern: /bg-yellow-.+/ },
+		{ pattern: /bg-green-.+/ },
+		{ pattern: /bg-blue-.+/ },
+	],
+
 	content: [
 		'./storage/framework/views/*.php',
 		'./resources/**/*.blade.php',
@@ -13,8 +20,6 @@ module.exports = {
 	],
 	theme: {
 		colors: {
-			'red': colors.red,
-
 		},
 		extend: {},
 	},

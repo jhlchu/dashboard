@@ -15,7 +15,7 @@
 		<link rel="stylesheet" href="https://fonts.sandbox.google.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 
 		{{-- <script src="https://unpkg.com/flowbite@1.4.5/dist/flowbite.js"></script>	 --}}
-		{{-- <script data-cfasync="false" src="{{ asset('js/tailwindcss-3.0.24.min.js') }}"></script> --}}
+		<script data-cfasync="false" src="{{ asset('js/tailwindcss-3.0.24.min.js') }}"></script>
 		{{-- <script data-cfasync="false" src="{{ asset('js/flowbite-1.4.5.min.js') }}"></script> --}}
 		<script data-cfasync="false" src="{{ asset('js/alpinejs-3.10.2.min.js') }}" defer></script>
 		<script data-cfasync="false"  src="{{ mix('js/app.js') }}"></script>
@@ -56,16 +56,16 @@
 					</div>
 					<ul class="flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium">
 						<li>
-							<a href="{{ route('invoices.create') }}" class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0  " aria-current="page">New Invoice</a>
+							<a href="{{ route('invoices.create') }}" class="block py-2 pr-4 pl-3 text-white border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 hover:text-blue-300 md:p-0  " aria-current="page">New Invoice</a>
 						</li>
 						<li>
-							<a href="{{ route('invoices.index') }}" class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('invoices.*') ? ' text-white bg-blue-700 rounded md:bg-transparent md:text-white md:p-0  ' : ' text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0' }}" aria-current="page">Invoices</a>
+							<a href="{{ route('invoices.index') }}" class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('invoices.*') ? ' text-yellow-300 md:p-0  ' : ' text-white md:p-0 hover:text-blue-300' }}" aria-current="page">Invoices</a>
 						</li>
 						<li>
-							<a href="{{ route('customers.index') }}" class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('customers.*') ? ' text-white bg-blue-700 rounded md:bg-transparent md:text-white md:p-0' : 'text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0' }}">Customers</a>
+							<a href="{{ route('customers.index') }}" class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('customers.*') ? ' text-yellow-300 md:p-0' : 'text-white md:p-0 hover:text-blue-300' }}">Customers</a>
 						</li>
 						<li>
-							<a href="{{ route('settings') }}" class="block py-2 pr-4 pl-3 text-gray-700 border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 ">Settings</a>
+							<a href="{{ route('settings') }}"  class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('settings') ? ' text-yellow-300 md:p-0' : 'text-white md:p-0 hover:text-blue-300' }}">Settings</a>
 						</li>
 					</ul>
 				</div>
