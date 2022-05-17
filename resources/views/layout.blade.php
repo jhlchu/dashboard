@@ -18,10 +18,10 @@
 		{{-- <script data-cfasync="false" src="{{ asset('js/tailwindcss-3.0.24.min.js') }}"></script> --}}
 		{{-- <script data-cfasync="false" src="{{ asset('js/flowbite-1.4.5.min.js') }}"></script> --}}
 		<script data-cfasync="false" src="{{ asset('js/alpinejs-3.10.2.min.js') }}" defer></script>
-		<script src="{{ mix('js/app.js') }}"></script>
+		<script data-cfasync="false"  src="{{ mix('js/app.js') }}"></script>
 		{{-- <link rel="stylesheet" href="https://unpkg.com/flowbite@1.4.5/dist/flowbite.min.css" /> --}}
 		{{-- <link rel="stylesheet" href="{{ asset('css/flowbite-1.4.5.min.css') }}" /> --}}
-		<link rel="stylesheet" href="{{ mix('css/app.css') }}" />
+		<link  data-cfasync="false" rel="stylesheet" href="{{ mix('css/app.css') }}" />
 		@stack('head_scripts')
 
     </head>
