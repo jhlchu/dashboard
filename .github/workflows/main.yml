@@ -14,4 +14,6 @@ jobs:
         passphrase: ${{ secrets.PASSWORD }}
         key: ${{ secrets.KEY1 }}
         port: ${{ secrets.PORT }}
-        script: whoami
+        script: |
+        cd ~/www/dashboard.element-acoustics.com/dashboard/
+        git pull
