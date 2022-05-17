@@ -15,5 +15,5 @@ jobs:
         key: ${{ secrets.KEY1 }}
         port: ${{ secrets.PORT }}
         script: |
-        cd ~/www/dashboard.element-acoustics.com/dashboard/
-        git pull
+          cd ~/www/dashboard.element-acoustics.com/dashboard/
+          git pull
