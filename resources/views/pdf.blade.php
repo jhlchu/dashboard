@@ -413,7 +413,7 @@
 
 
 		<div style="visibility:hidden;">
-				<p>{!! html_entity_decode($disclaimer->line1) !!}</p>
+				<p>{{ $disclaimer->line1 }}</p>
 				<p>{{ $disclaimer->line2 }}</p>
 				<table>
 					<tr>
@@ -423,8 +423,8 @@
 				</table>
 			</div>
 		<div class="disclaimer">
-				<p>{{ $disclaimer->line1 }}</p>
-				<p>{{ $disclaimer->line2 }}</p>
+				<p>{!! html_entity_decode($disclaimer->line1) !!}</p>
+				<p>{!! html_entity_decode($disclaimer->line2) !!}</p>
 				<table>
 					<tr>
 						<td>Customer Signature:</td>
