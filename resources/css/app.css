@@ -9,6 +9,9 @@
 }
 
 @layer utilities {
+	a {
+			@apply text-blue-500;
+		}
 
 	.table-stripes:nth-of-type(2n)>td {
 		@apply bg-gray-100;
@@ -38,6 +41,7 @@
 		transform: scale(1);
 	}
 }
+
 /* 
 .bg-blue-500 {
 	--tw-bg-opacity: 1;

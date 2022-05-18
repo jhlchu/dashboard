@@ -19,7 +19,6 @@ class CreateInvoicesTable extends Migration
 			$table->unsignedTinyInteger('company_id');
             $table->timestamps();
 			$table->unsignedTinyInteger('status_id');
-			//$table->enum('status', ['Draft', 'Completed', 'Paid', 'Deleted'])->default('Draft');
 			$table->unsignedTinyInteger('salesperson_id');
 			$table->unsignedInteger('customer_id');
 			$table->text('notes')->nullable()->nullable();
@@ -30,6 +29,13 @@ class CreateInvoicesTable extends Migration
 			$table->timestamp('paid_at')->nullable();
         });
     }
+	//Get Customer -> $customer_id
+		//Create Customer OR Get First
+	//Create Invoice
+	//Generate $invoice_number
+	//If Status
+
+
 
     /**
      * Reverse the migrations.

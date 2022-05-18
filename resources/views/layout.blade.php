@@ -10,18 +10,21 @@
 
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+		<link rel="stylesheet" href="https://fonts.sandbox.google.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
+		
 		{{-- <script src="//unpkg.com/alpinejs" defer></script> --}}
 		{{-- <script src="https://cdn.tailwindcss.com"></script> --}}
-		<link rel="stylesheet" href="https://fonts.sandbox.google.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
 
-		{{-- <script src="https://unpkg.com/flowbite@1.4.5/dist/flowbite.js"></script>	 --}}
 		<script data-cfasync="false" src="{{ asset('js/tailwindcss-3.0.24.min.js') }}"></script>
+		{{-- <script src="https://unpkg.com/flowbite@1.4.5/dist/flowbite.js"></script>	 --}}
 		{{-- <script data-cfasync="false" src="{{ asset('js/flowbite-1.4.5.min.js') }}"></script> --}}
-		<script data-cfasync="false" src="{{ asset('js/alpinejs-3.10.2.min.js') }}" defer></script>
-		<script data-cfasync="false"  src="{{ mix('js/app.js') }}"></script>
 		{{-- <link rel="stylesheet" href="https://unpkg.com/flowbite@1.4.5/dist/flowbite.min.css" /> --}}
 		{{-- <link rel="stylesheet" href="{{ asset('css/flowbite-1.4.5.min.css') }}" /> --}}
+
+		<script data-cfasync="false" src="{{ asset('js/alpinejs-3.10.2.min.js') }}" defer></script>
+		<script data-cfasync="false" src="{{ mix('js/app.js') }}"></script>
 		<link  data-cfasync="false" rel="stylesheet" href="{{ mix('css/app.css') }}" />
+
 		@stack('head_scripts')
 
     </head>

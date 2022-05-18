@@ -1,32 +1,37 @@
 @extends('layout')
-
 @push('head_scripts')
 	<meta name="csrf-token" content="{{ csrf_token() }}">
+	<script type="text/javascript">
+		const old_company           = "{{ old('company_id') ?? null }}";
+		const old_user              = "{{ old('salesperson_id') ?? null }}";
+		const old_name              = "{{ old('name') ?? null }}";
+		const old_email             = "{{ old('email') ?? null }}";
+		const old_phone             = "{{ old('phone') ?? null }}";
+		const old_address           = "{{ old('address') ?? null }}";
+		const old_province          = "{{ old('province') ?? null }}";
+		const old_country           = "{{ old('country') ?? null }}";
+		const old_tax_region        = "{{ old('tax_region') ?? null }}";
+		const old_cart              = JSON.parse('{!! old('payload') ?? "[]" !!}');
+		const old_shipping_handling = "{{ old('shipping_handling') ?? null }}";
+		const old_invoice_discount  = "{{ old('discount_string') ?? null }}";
+		const old_notes  = "{{ old('notes') ?? null }}";
+
+		const taxes = JSON.parse('@json($taxes)');
+		console.log(taxes);
+	</script>
 @endpush
 @push('body_scripts')
 	<script data-cfasync="false" src="{{ asset('js/cart.js') }}"></script>
 @endpush
 @section('content')
-	<div class="flex flex-col  max-w-[80%] m-auto">
-		<form method="POST" action="{{route('invoices.store')}}" autocomplete="nop">
+	<div class="flex flex-col max-w-[80%] m-auto">
+		<form method="POST" action="{{route('invoices.store')}}" autocomplete="nop" id="invoice_form">
 			@csrf
-			<div class="flex flex-row justify-between">
-				@foreach ($statuses as $status)
-					@if (preg_match("(Draft|Completed|Paid)", $status->name) === 1)
-						<button type="submit" class="text-white bg-{{ $status->color }}-700 hover:bg-{{ $status->color }}-800 focus:ring-4 focus:outline-none focus:bg-{{ $status->color }}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 w-[250px]" name="status" value="{{ $status->id }}">
-							<span class="material-symbols-outlined">{{ $status->icon }}</span>{{ $status->name }}
-						</button>
-					@endif
-				@endforeach
-				<button type="submit" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none w-[250px] focus:bg-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2" name="status" value="cancel">
-					<span class="material-symbols-outlined">cancel</span>Cancel
-				</button>
-			</div>
 
 			<h2 class="border-b-2 border-gray-700 text-lg p-3 font-medium my-3 ">Company Information</h2>
 			<div class="flex flex-row m-3 mb-5">
-				<x-forms.select name="company" label="Company" :data="$companies" icon="apartment" />
-				<x-forms.select name="user" label="Salesperson" :data="$salespeople" icon="group" class="w-[200px]"/>
+				<x-forms.select name="company_id" label="Company" :data="$companies" icon="apartment" oldIndex=old_company />
+				<x-forms.select name="salesperson_id" label="Salesperson" :data="$salespeople" icon="group" oldIndex=old_user class="w-[200px]" />
 			</div>
 
 			<h2 class="border-b-2 border-gray-700 text-lg p-3 font-medium">Customer Information</h2>
@@ -38,7 +43,7 @@
 							<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md material-symbols-outlined">
 								person
 							</span>
-							<input type="search" name="name" id="customer" x-bind:value="current_customer.name" @input.debounce="searchCustomers" @blur.debounce="unselect" @focus.debounce="searchCustomers" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm border-gray-300 p-2.5" autocomplete="nop">
+							<input type="search" name="name" id="customer" x-bind:value="current_customer.name" @input.debounce="searchCustomers" @blur.debounce="unselect" @focus.debounce="searchCustomers" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5" required="required" autocomplete="nop">
 						</div>
 						@error('name')
 							{{ $message }}
@@ -60,14 +65,34 @@
 				<div class="flex flex-row m-3">
 					<x-forms.input-bind name="province" label="Province" type="search" model="current_customer" icon="map" class="flex-grow" />
 					<x-forms.input-bind name="country" label="Country" type="search" model="current_customer" icon="public" class="flex-grow" />
-					<x-forms.select name="tax_region" label="Tax Region" :data="$tax_regions" icon="payments" @change="searchTax"/>
+					
+					<div class='mx-3 w-[200px]'>
+						<label for="tax_region" class="block mb-2 text-sm font-medium text-gray-900">Tax Region</label>
+						<div class="flex">
+							<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md material-symbols-outlined">
+								payments
+							</span>
+							<select name="tax_region" id="tax_region"  class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5">
+								@foreach ($taxes as $row)
+									<option {{ old('tax_region') == $row->id ? 'selected' : '' }} value="{{ $row->id }}">{{ $row->name }}</option>
+								@endforeach
+							</select>
+						</div>
+						@error('tax_region')
+							{{ $message }}
+						@enderror
+					</div>
+
+					{{-- <x-forms.select name="tax_region" label="Tax Region" :data="$tax_regions" icon="payments" oldIndex=0 @change="searchTax" /> --}}
 				</div>
-			
 
 			<h2 class="border-b-2 border-gray-700 text-lg p-3 font-medium">Invoice Cart</h2>
-			<div class="flex flex-col">
+			<div class="flex flex-col m-3">
 				<input type="hidden" name="payload" x-bind:value="invoice_cart" value=""></input>
 				@error('payload')
+					{{ $message }}
+				@enderror
+				@error('payload', 'cart')
 					{{ $message }}
 				@enderror
 				@error('description', 'cart')
@@ -79,68 +104,153 @@
 				@error('quantity', 'cart')
 					{{ $message }}
 				@enderror
-				<table class="md:table w-full">
-					<thead>
-						<tr x-on:keydown.prevent.enter="">
-							<td><input type="text" placeholder="Enter Description" class="border-2 border-gray-100 my-2 mx-1 p-1" x-model="new_cart_row.description" @keyup.enter="addCartRow" id="input_description"/></td>
-							<td><input type="number" placeholder="Enter Price" class="border-2 border-gray-100 my-2 mx-1 p-1" x-model="new_cart_row.price" @keyup.enter="addCartRow" /></td>
-							<td><input type="text" placeholder="Enter Discount ($ or %)" class="border-2 border-gray-100 my-2 mx-1 p-1" x-model="new_cart_row.discount" @keyup.enter="addCartRow" /></td>
-							<td><input type="number" placeholder="Enter Quantity" class="border-2 border-gray-100 my-2 mx-1 p-1" x-model="new_cart_row.quantity" @keyup.enter="addCartRow" /></td>
-							<td><p x-text="twoDigitString(calculateTotal(new_cart_row.price, new_cart_row.discount, new_cart_row.quantity))" class="before:content-['$'] my-2 mx-1 p-1 text-right"></p></td>
-							<td></td>
+				<table class="md:table-fixed w-full">
+					<thead class="md:table-row-group">
+						<tr x-on:keydown.prevent.enter="" class="md:table-row">
+							<td>
+								<div class='mx-1'>
+									<div class="flex">
+										<input type="text" placeholder="Description" class="rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 text-left" x-model="new_cart_row.description" @keyup.enter="addCartRow" id="input_description"/>
+									</div>
+									@error('description', 'cart')
+										{{ $message }}
+									@enderror
+								</div>
+							</td>
+							<td class="md:table-cell md:w-2/12">
+								<div class='mx-1'>
+									<div class="flex">
+										<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md material-symbols-outlined">
+											attach_money
+										</span>
+										<input type="number" placeholder="Price" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 text-right" x-model="new_cart_row.price" @keyup.enter="addCartRow" />
+									</div>
+									@error('price', 'cart')
+										{{ $message }}
+									@enderror
+								</div>
+							</td>
+							<td class="md:table-cell md:w-2/12">
+								<div class='mx-1'>
+									<div class="flex">
+										<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
+											<span class="material-symbols-outlined text-sm">attach_money</span>/<span class="material-symbols-outlined text-sm">percent</span>
+										</span>
+										<input type="text" placeholder="Discount" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 text-right" x-model="new_cart_row.discount" @keyup.enter="addCartRow" />
+									</div>
+								</div>
+							</td>
+							<td class="md:table-cell md:w-[140px] ">
+								<div class='mx-1'>
+									<div class="flex">
+										<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md material-symbols-outlined">
+											tag
+										</span>
+										<input type="number" placeholder="Quantity" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 text-center" x-model="new_cart_row.quantity" @keyup.enter="addCartRow" />
+									</div>
+									@error('quantity', 'cart')
+										{{ $message }}
+									@enderror
+								</div>
+							</td>
+							<td class="md:w-[150px]">
+								<p x-text="twoDigitString(calculateTotal(new_cart_row.price, new_cart_row.discount, new_cart_row.quantity))" class="before:content-['$'] my-2 mx-1 p-1 text-right text-lg"></p>
+							</td>
+							<td class="md:w-1/12"></td>
 						</tr>
 					</thead>
-					<tbody>
+					<tbody class="md:table-row-group">
 						<tr>
-							<th>Description</th>
-							<th>Price</th>
-							<th>Discount</th>
-							<th>Quantity</th>
-							<th>Total</th>
-							<th>Delete</th>
+							<th class="text-left font-thin text-sm">Description</th>
+							<th class="text-right font-thin text-sm">Price</th>
+							<th class="text-right font-thin text-sm">Discount</th>
+							<th class="text-center font-thin text-sm">Quantity</th>
+							<th class="text-right font-thin text-sm">Total</th>
+							<th class="text-center font-thin text-sm">Delete</th>
 						</tr>
 						<template x-for="cart_row in cart" x-effect="updateJson()">
 							<tr x-on:keydown.prevent.enter="" :key="cart_row.id" >
-								<td><input type="text" class="border-2 border-gray-100 mx-1 p-1" x-model="cart_row.description" :value="cart_row.description" /></td>
-								<td><input type="number" class="border-2 border-gray-100 mx-1 p-1" x-model="cart_row.price" /></td>
+								<td><input type="text" class="border-2 border-gray-100 mx-1 p-1" x-model="cart_row.description" :value="cart_row.description" required="required" /></td>
+								<td><input type="number" class="border-2 border-gray-100 mx-1 p-1" x-model="cart_row.price" required="required" /></td>
 								<td><input type="text" class="border-2 border-gray-100 mx-1 p-1" x-model="cart_row.discount" /></td>
-								<td><input type="number" class="border-2 border-gray-100 mx-1 p-1" x-model="cart_row.quantity" /></td>
+								<td><input type="number" class="border-2 border-gray-100 mx-1 p-1" x-model="cart_row.quantity" required="required" /></td>
 								<td><p x-text="twoDigitString(calculateTotal(cart_row.price, cart_row.discount, cart_row.quantity))" class="before:content-['$'] mx-1 p-1 text-right"></p></td>
-								<td><button type="button" @click="removeCartRow(cart_row)">X</button></td>
+								<td class="text-center"><button type="button" @click="removeCartRow(cart_row)"><span class="material-symbols-outlined text-center text-red-500 font-semibold">close</span></button></td>
 							</tr>
 						</template>
-						<tr>
-							<td>Gross Total</td>
-							<td><p x-text="money(grossTotal())"></p></td>
+
+
+						<tr class="border-b-2 border-gray-700">
+							<td><p class="text-right">Gross Total</p></td>
+							<td><p class="text-right" x-text="money(grossTotal())"></p></td>
 						</tr>
 						<tr>
-							<td>Shipping & Handling</td>
-							<td><input type="text" name="shipping_handling" x-model="shipping_handling" /></td>
+							<td><p class="text-right" ><span class="material-symbols-outlined mr-2">local_shipping</span>Shipping & Handling</p></td>
+							<td>
+								<div class='ml-3'>
+									<div class="flex">
+										<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md material-symbols-outlined">
+											attach_money
+										</span>
+										<input type="number" name="shipping_handling" id="shipping_handling" x-model="shipping_handling" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 text-right" >
+									</div>
+									@error('shipping_handling')
+										{{ $message }}
+									@enderror
+								</div>
+							</td>
 						</tr>
 						<tr>
-							<td>Invoice Discount</td>
-							<td><input type="text" name="invoice_discount" placeholder="$ or %" x-model="invoice_discount" /></td>
+							<td><p class="text-right" ><span class="material-symbols-outlined mr-2">sell</span>Invoice Discount</p></td>
+							{{-- <td><input type="text" name="discount_string" placeholder="$ or %" x-model="invoice_discount" /></td> --}}
+							<td>
+								<div class='ml-3'>
+									<div class="flex">
+										<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
+											<span class="material-symbols-outlined text-sm">attach_money</span>/<span class="material-symbols-outlined text-sm">percent</span>
+										</span>
+										<input type="text" name="discount_string" id="discount_string" x-model="invoice_discount" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 text-right" >
+									</div>
+									@error('discount_string')
+										{{ $message }}
+									@enderror
+								</div>
+							</td>
 						</tr>
 						<template x-for="tax in taxes" :key="tax.name">
 							<tr>
-								<td><p x-text="tax.name + ' (' + (tax.value * 100) + '%)'"></p></td>
-								<td><p x-text="grossTotal() * tax.value"></p></td>
+								<td><p class="text-right" x-text="tax.name + ' (' + twoDigitString(tax.value * 100) + '%)'"></p></td>
+								<td><p class="text-right" x-text="twoDigitString(grossTotal() * tax.value)"></p></td>
 							</tr>
 						</template>
 						<tr>
-							<td>Before Tax</td>
-							<td><p x-text="money(beforeTax())"></p></td>
+							<td><p class="text-right">Before Tax</p></td>
+							<td><p class="text-right" x-text="money(beforeTax())"></p></td>
 						</tr>
-						<tr>
-							<td>NET TOTAL</td>
-							<td><p x-text="money(netTotal())"></p></td>
+						<tr class="border-y-4 border-black">
+							<td><p class="md:font-bold md:text-2xl md:text-right">NET TOTAL</p></td>
+							<td><p class="md:text-2xl md:font-bold md:text-right " x-text="money(netTotal())"></p></td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 			</div>
 			<h2 class="border-b-2 border-gray-700 text-lg p-3 mb-2 font-medium">Notes</h2>
-			<textarea class="border-2 border-gray-300 rounded p-3 my-3 w-full" type="text" rows="10" placeholder="Enter notes here."></textarea>
+			<textarea class="border-2 border-gray-300 rounded-lg p-3 my-3 w-full" type="text" rows="10" placeholder="Enter notes here."></textarea>
+			<div class="absolute bottom-0 left-0 right-0 py-3">
+				<div class="flex flex-row justify-center">
+					@foreach ($statuses as $status)
+						{{-- @if (preg_match("(Draft|Completed|Paid)", $status->name) === 1) --}}
+						<button type="submit" class="text-white bg-{{ $status->color }}-700 hover:bg-{{ $status->color }}-800 focus:ring-4 focus:outline-none focus:bg-{{ $status->color }}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 w-[250px]" name="status" value="{{ $status->id }}">
+							<span class="material-symbols-outlined">{{ $status->icon }}</span>{{ $status->name }}
+						</button>
+						{{-- @endif --}}
+					@endforeach
+					<button type="submit" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none w-[250px] focus:bg-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2" name="status" value="cancel">
+						<span class="material-symbols-outlined">cancel</span>Cancel
+					</button>
+				</div>
+			</div>
 		</form>
 	</div>
 

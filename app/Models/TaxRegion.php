@@ -12,10 +12,10 @@ class TaxRegion extends Model
 	public $timestamps = false;
 
 	public function tax() {
-		$this->hasMany(Tax::class, 'id', 'region_id');
+		return $this->hasMany(Tax::class, 'region_id', 'id');
 	}
 
 	public function customer() {
-		$this->hasMany(Customer::class);
+		return $this->hasMany(Customer::class);
 	}
 }

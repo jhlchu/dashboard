@@ -22,32 +22,27 @@ let len = 0;
 
 document.addEventListener("alpine:init", () => {
 	Alpine.data("invoice", () => ({
-
-		show_suggestions : false,
-		taxes            : [],
-		customer_list    : [],
-		current_customer : {
-			name       : '',
-			address    : '',
-			country    : '',
-			email      : '',
-			phone      : '',
-			province   : '',
-			tax_region : 0
-		},
-
 		init() {
-			this.show_suggestions = false,
-			this.taxes            = [],
-			this.customer_list    = [],
-			this.current_customer = {
-				name       : '',
-				address    : '',
-				country    : '',
-				email      : '',
-				phone      : '',
-				province   : '',
-				tax_region : 0
+			this.show_suggestions  = false,
+			this.taxes             = [],
+			this.customer_list     = [],
+			this.cart              = old_cart,
+			this.invoice_discount  = old_invoice_discount ? old_invoice_discount : '',
+			this.shipping_handling = old_shipping_handling ? old_shipping_handling : 0,
+			this.invoice_cart      = old_cart ? old_cart : '',
+			this.new_cart_row      = {},
+			this.current_customer  = {
+				name       : old_name ? old_name             : '',
+				address    : old_address ? old_address       : '',
+				country    : old_country ? old_country       : '',
+				email      : old_email ? old_email           : '',
+				phone      : old_phone ? old_phone           : '',
+				province   : old_province ? old_province     : '',
+				tax_region : old_tax_region ? old_tax_region : '',
+			}
+			if (old_tax_region) {
+				this.taxes = taxes.find(tax => tax.id === parseInt(old_tax_region)).tax;
+				console.log('t',this.taxes);
 			}
 		},
 
@@ -73,27 +68,21 @@ document.addEventListener("alpine:init", () => {
 				},
 				body: JSON.stringify({'name': name})
 			});
+			console.log('response', response);
 			this.customer_list = response.status === 200 && await response.json();
-
-			if (Array.isArray(this.customer_list) && this.customer_list.length > 0) {
-				this.show_suggestions = true;
-			} else { this.show_suggestions = false; }
+			this.show_suggestions = (Array.isArray(this.customer_list) && this.customer_list.length > 0) ? true : false;
 		},
 
 		selectCustomer(id) {
 			this.current_customer = this.customer_list.find(customer => customer.id === id);
 			this.show_suggestions = false;
 			document.querySelector('#tax_region').selectedIndex = this.current_customer.tax_region - 1;
-			this.searchTax({target : {value : this.current_customer.tax_region}});
+			this.taxes = taxes.find(tax => tax.id === this.current_customer.tax_region).tax;
+			console.log('tax', this.taxes);
+			/* this.searchTax({target : {value : this.current_customer.tax_region}}); */
 		},
 
 		unselect() { this.show_suggestions = false; },
-
-		cart             : [],
-		invoice_discount         : '',
-		shipping_handling : 0,
-		invoice_cart     : '',
-		new_cart_row     : {},
 
 		updateJson() { this.invoice_cart = JSON.stringify(this.cart); },
 
@@ -112,7 +101,6 @@ document.addEventListener("alpine:init", () => {
 			document.querySelector('#input_description').focus();
 			this.invoice_cart = JSON.stringify(this.cart);
 		},
-
 
 		calculateTotal(price = 0.00, discount, quantity = 0) {
 			if (!discount || discount === 0) { return price * quantity; }

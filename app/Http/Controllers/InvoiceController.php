@@ -9,12 +9,12 @@ use App\Models\User;
 use App\Models\Customer;
 use App\Models\TaxRegion;
 use App\Models\Company;
+use App\Models\InvoiceRow;
 use App\Models\Status;
-
-
-use Illuminate\Support\Facades\Validator;
+use App\Models\Tax;
+//use Illuminate\Support\Facades\Validator;
 use Barryvdh\DomPDF\Facade\Pdf;
-//use Validator;
+use Validator;
 use Illuminate\Support\Facades\Hash;
 
 class InvoiceController extends Controller
@@ -45,12 +45,14 @@ class InvoiceController extends Controller
      */
     public function create()
     {
+		
         return view('invoices.create', [
 			'companies'   => Company::all(),
 			'tax_regions' => TaxRegion::all(),
 			'salespeople' => User::all(),
 			'customers'   => Customer::all(),
-			'statuses' => Status::all()
+			'statuses' => Status::whereIn('name', ['Draft', 'Completed', 'Paid'])->get(),
+			'taxes' => TaxRegion::with('tax')->get()
 		]);
     }
 
@@ -66,40 +68,67 @@ class InvoiceController extends Controller
 		if (request('status') === 'cancel') {
 			return redirect()->route('invoices.index');
 		}
-		
+
 		//Validate Invoice
 		request()->validate([
-			'company'    => ['required', 'exists:companies,id'],
-			'status'     => ['required', 'exists:statuses,id'],
-			'user'       => ['required', 'exists:users,id'],
-			'payload'    => ['required', Rule::notIn(['[]'])],
-			'name'       => ['required', 'string'],
-			'address'    => ['string'],
-			'email'      => ['email'],
-			'phone'      => ['string'],
-			'country'    => ['string'],
-			'province'   => ['string'],
-			'tax_region' => ['required', 'exists:tax_regions,id'],
-			'notes'      => ['string']
+			'company_id'     => ['required', 'exists:companies,id'],
+			'status'         => ['required', 'exists:statuses,id'],
+			'salesperson_id' => ['required', 'exists:users,id'],
+			'payload'        => ['required', Rule::notIn(['[]'])],
+			'name'           => ['required', 'string'],
+			'address'        => ['string', "nullable"],
+			'email'          => ['email', "nullable"],
+			'phone'          => ['string', "nullable"],
+			'country'        => ['string', "nullable"],
+			'province'       => ['string', "nullable"],
+			'tax_region'     => ['required', 'exists:tax_regions,id'],
+			'notes'          => ['string', "nullable"],
+			'payload.*.description'          => ['string', "required"],
 		]);
 
 		//Validate Invoice Row
-		$data = json_decode($request->payload, true);
-		$validator = Validator::make($data , [
-			'description' => 'required|string',
-			'price'       => 'required|digits',
-			'discount'    => 'string|nullable',
-			'quantity'    => 'required|digits'
-		]);
+		/* $data = json_decode($request->payload, true);
 
+		$validator = Validator::make($data, [
+			'*.description' => 'required|string',
+			'*.price'       => 'required',
+			'*.discount'    => 'string|nullable',
+			'*.quantity'    => 'required|string'
+		]);
+		
+		
 		if ($validator->fails()) {
 			return redirect()
-				->route('invoices.create')
-				->withErrors($validator, 'cart')
-				->withInput();
-        }
+			->route('invoices.create')
+			->withErrors($validator, 'cart')
+			->withInput();
+        } */
+
+		dd(request());
+
+		//Create Customer
+		$customer = request()->customer;
 		
-		
+		//Create Invoice
+		/* $invoice = Invoice::create([
+			request()->validated()
+		]); */
+//Create Invoice Rows
+		/* foreach ($data as $invoice_row) {
+			InvoiceRow::create([
+				'invoice_id' => request()->id,
+				'description' => ,
+				'price' => ,
+				'quantity' => ,
+				'discount_string' => ,
+				'discount_value' => ,
+				'refund_quantity' => ,
+				'deleted' => 
+			])
+		}  */
+
+
+
 		/* 
 			$input = [
 				'user' => [
