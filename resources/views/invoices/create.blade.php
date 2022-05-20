@@ -13,7 +13,7 @@
 		const old_tax_region        = "{{ old('tax_region') ?? null }}";
 		const old_cart              = JSON.parse('{!! old('invoice_cart') ?? "[]" !!}');
 		const old_shipping_handling = "{{ old('shipping_handling') ?? null }}";
-		const old_invoice_discount  = "{{ old('discount_string') ?? null }}";
+		const old_invoice_discount  = "{{ old('discount') ?? null }}";
 		const old_notes  = "{{ old('notes') ?? null }}";
 
 		const taxes = {{ Js::from($taxes) }};
@@ -222,9 +222,9 @@
 												<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
 													<span class="material-symbols-outlined text-sm">attach_money</span>/<span class="material-symbols-outlined text-sm">percent</span>
 												</span>
-												<input type="text" name="discount_string" id="discount_string" x-model="invoice_discount" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 text-right" >
+												<input type="text" name="discount" id="discount" x-model="invoice_discount" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 text-right" >
 											</div>
-											@error('discount_string')
+											@error('discount')
 												{{ $message }}
 											@enderror
 										</div>

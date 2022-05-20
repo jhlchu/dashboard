@@ -70,19 +70,20 @@ class InvoiceController extends Controller
 		}
 
 		//Validate Invoice
-		request()->validate([
-			'company_id'     => ['required', 'exists:companies,id'],
-			'status'         => ['required', 'exists:statuses,id'],
-			'salesperson_id' => ['required', 'exists:users,id'],
-			'invoice_cart'        => ['required', Rule::notIn(['[]'])],
-			'name'           => ['required', 'string'],
-			'email'          => ['email', "nullable"],
-			'phone'          => ['string', "nullable"],
-			'address'        => ['string', "nullable"],
-			'province'       => ['string', "nullable"],
-			'country'        => ['string', "nullable"],
-			'tax_region'     => ['required', 'exists:tax_regions,id'],
-			'notes'          => ['string', "nullable"],
+		request()->validate(['company_id'        => ['required', 'exists:companies,id'],
+			'status'            => ['required', 'exists:statuses,id'],
+			'salesperson_id'    => ['required', 'exists:users,id'],
+			'invoice_cart'      => ['required', Rule::notIn(['[]'])],
+			'name'              => ['required', 'string'],
+			'email'             => ['email', "nullable"],
+			'phone'             => ['string', "nullable"],
+			'address'           => ['string', "nullable"],
+			'province'          => ['string', "nullable"],
+			'country'           => ['string', "nullable"],
+			'tax_region'        => ['required', 'exists:tax_regions,id'],
+			'notes'             => ['string', "nullable"],
+			'shipping_handling' => ['digit', "nullable"],
+			'discount'          => ['string', "nullable"]
 			/* 'invoice_cart.*.description'          => ['string', "required"], */
 		]);
 
@@ -107,16 +108,20 @@ class InvoiceController extends Controller
 		dd(request());
 
 		//Create Customer
-		$customers  = Customer::where([
-			['name', request('name')],
-			['tax_region', request('tax_region')]
-		])
-		->where(function ($query) {
+		$customers = Customer::where(function ($query) {
+			$query->where('name', request('name'))
+			->where('tax_region', request('tax_region'));
+		})->where(
+			function ($query) {
 			$query->where('address', request('address'))
 			->orWhere('email', request('email'))
-			->orWhere('phone', request('phone'))
-			->orWhere('province', request('province'))
-			->orWhere('country', request('country'));
+					->orWhere('phone', request('phone'));
+				/* ->when( request('province', function ($query) {
+						$query->where();
+					})
+					->orWhere('province', request('province'))
+					->orWhere('country', request('country'));
+				) */
 		})->get();
 
 		switch ($customers->count()) {
@@ -143,15 +148,47 @@ class InvoiceController extends Controller
 
 		//Create Invoice
 		$invoice = new Invoice;
-		$invoice->invoice_number;
+
+		/* $invoice->customer->firstOrCreate([]); */
+		$invoice->customer_id;
+
+		if (Invoice::whereYear('created_at', date("Y"))->count() === 0) {
+			$invoice->invoice_number = date("y") . str_pad(1, 6, '0', STR_PAD_LEFT); //New Year
+		} else {
+			$invoice->invoice_number = intval(Invoice::latest()->first()->value('invoice_number')) + 1; //Same Year
+		}
+
+		$invoice_grosstotal = collect($invoice_rows)->reduce(function ($total, $item) {
+			[$price, $discount, $quantity] = $item;
+			if ($discount . contains('%')) {
+				return $total + (($price * (1 - floatval($discount) / 100)) * $quantity);
+			}
+			if ($discount . contains('$')) {
+				return $total + (($price - floatval($discount)) * $quantity);
+			}
+			return $total + ($price * $quantity);
+		}, 0);
+
+		if (request('discount') . contains('%')) {
+			$invoice_discount = $invoice_grosstotal * (floatval(request('discount')) / 100);
+		}
+		if (request('discount') . contains('$')) {
+			$invoice_discount = floatval(request('discount'));
+		}
+
+		$invoice_tax = Tax::where('region_id', request('tax_region'))->get()->reduce(function ($tax_total, $tax) {
+			return $tax_total + $tax->value;
+		}, 0);
+
+		$invoice_nettotal = ($invoice_grosstotal + request('shipping_handling') - $invoice_discount) * (1 + $invoice_tax);
+
 		$invoice->company_id = request('company_id');
 		$invoice->status = request('status');
 		$invoice->salesperson_id = request('salesperson_id');
 		$invoice->notes = request('notes');
-		$invoice->customer_id = request('customer_id');
 		$invoice->shipping_handling = request('shipping_handling');
 		$invoice->discount_string = request('discount_string');
-		$invoice->discount_value = request('discount_value');
+		$invoice->net_total = $invoice_nettotal;
 
 		if (Status::find(request('status'))->name === 'Completed') {
 			$invoice->completed_at = request('completed_at');
@@ -162,13 +199,25 @@ class InvoiceController extends Controller
 		}
 		$invoice->store();
 
+		foreach ($invoice_rows as $invoice_row) {
+			[$description, $price, $discount, $quantity] = $invoice_row;
+
+			$temp_row = new InvoiceRow;
+
+			$temp_row->invoice_id  = $invoice->invoice_number;
+			$temp_row->description = $description;
+			$temp_row->price       = $price;
+			$temp_row->discount    = $discount;
+			$temp_row->quantity    = $quantity;
+			$temp_row->store();
+		}
+
 		/* $invoice = Invoice::create([
 			request()->validated()
 			'customer_id'->$customer->id
 		]); */
 
-		foreach ($invoice_rows as $invoice_row) {
-		}
+	
 		//Create Invoice Rows
 		/* foreach ($data as $invoice_row) {
 			InvoiceRow::create([

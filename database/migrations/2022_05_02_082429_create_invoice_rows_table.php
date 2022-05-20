@@ -20,10 +20,8 @@ class CreateInvoiceRowsTable extends Migration
 			$table->unsignedFloat('price');
 			$table->unsignedTinyInteger('quantity');
 			$table->string('discount_string')->nullable();
-			$table->unsignedFloat('discount_value')->nullable();
 			$table->unsignedTinyInteger('refund_quantity')->nullable();
 			$table->boolean('deleted');
-			//$table->timestamps();
 		});
     }
 

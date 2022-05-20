@@ -47,23 +47,6 @@ class CustomerController extends Controller
         return view('customers.show', ['customer' => $customer]);
     }
 
-	public function APIShow(Request $request) {
-		$validator = \Validator::make($request->all(), [
-			'name' => ['required', 'string']
-		]);
-		if ($validator->fails()) {
-			return response(['message' => $validator->messages()], 400);
-		} else {
-			try {
-				return Customer::where('name', 'like', '%'.request('name').'%')->limit(5)->get();
-			} catch (\Exception $e) {
-				return response(['message'=> $e->getMessage()], 400); 
-			}
-		}
-
-
-	}
-
     /**
      * Show the form for editing the specified resource.
      *

@@ -23,8 +23,8 @@ class CreateInvoicesTable extends Migration
 			$table->unsignedInteger('customer_id');
 			$table->text('notes')->nullable()->nullable();
 			$table->unsignedFloat('shipping_handling')->nullable();
-			$table->string('discount_string')->nullable();
-			$table->unsignedFloat('discount_value')->nullable();
+			$table->string('discount')->nullable();
+			$table->unsignedFloat('net_total')->nullable();
 			$table->timestamp('completed_at')->nullable();
 			$table->timestamp('paid_at')->nullable();
         });

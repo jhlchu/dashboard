@@ -14,8 +14,7 @@ class CreateTaxRegionsTable extends Migration
     public function up()
     {
         Schema::create('tax_regions', function (Blueprint $table) {
-            $table->tinyIncrements('id');
-            //$table->unsignedSmallInteger('tax_id');
+			$table->tinyIncrements('id');
 			$table->string('name');
         });
     }
