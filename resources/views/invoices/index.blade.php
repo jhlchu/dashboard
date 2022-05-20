@@ -7,12 +7,12 @@
 @extends('layout')
 @section('content')
     @push('head_scripts')
-        <script>
+        <script data-cfasync="false">
             const hashes = {{ Js::from($hashes) }};
         </script>
     @endpush
     @push('body_scripts')
-        <script src="{{ asset('js/form_modal.js') }}"></script>
+        <script data-cfasync="false" src="{{ asset('js/form_modal.js') }}"></script>
     @endpush
     <x-modals.form-modal />
     <div class="flex flex-col">

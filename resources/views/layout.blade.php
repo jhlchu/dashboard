@@ -59,16 +59,16 @@
 					</div>
 					<ul class="flex flex-col mt-4 md:flex-row md:space-x-8 md:mt-0 md:text-sm md:font-medium">
 						<li>
-							<a href="{{ route('invoices.create') }}" class="block py-2 pr-4 pl-3 text-white border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 hover:text-blue-300 md:p-0  " aria-current="page">New Invoice</a>
+							<a href="{{ route('invoices.create') }}" class="block py-2 pr-4 pl-3 text-white border-b border-gray-100 hover:bg-gray-50 md:hover:bg-transparent md:border-0 hover:text-yellow-200 md:p-0  " aria-current="page">New Invoice</a>
 						</li>
 						<li>
-							<a href="{{ route('invoices.index') }}" class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('invoices.*') ? ' text-yellow-300 md:p-0  ' : ' text-white md:p-0 hover:text-blue-300' }}" aria-current="page">Invoices</a>
+							<a href="{{ route('invoices.index') }}" class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('invoices.*') ? ' text-yellow-300 md:p-0  ' : ' text-white md:p-0 hover:text-yellow-200' }}" aria-current="page">Invoices</a>
 						</li>
 						<li>
-							<a href="{{ route('customers.index') }}" class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('customers.*') ? ' text-yellow-300 md:p-0' : 'text-white md:p-0 hover:text-blue-300' }}">Customers</a>
+							<a href="{{ route('customers.index') }}" class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('customers.*') ? ' text-yellow-300 md:p-0' : 'text-white md:p-0 hover:text-yellow-200' }}">Customers</a>
 						</li>
 						<li>
-							<a href="{{ route('settings') }}"  class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('settings') ? ' text-yellow-300 md:p-0' : 'text-white md:p-0 hover:text-blue-300' }}">Settings</a>
+							<a href="{{ route('settings') }}"  class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('settings') ? ' text-yellow-300 md:p-0' : 'text-white md:p-0 hover:text-yellow-200' }}">Settings</a>
 						</li>
 					</ul>
 				</div>

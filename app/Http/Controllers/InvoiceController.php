@@ -74,22 +74,22 @@ class InvoiceController extends Controller
 			'company_id'     => ['required', 'exists:companies,id'],
 			'status'         => ['required', 'exists:statuses,id'],
 			'salesperson_id' => ['required', 'exists:users,id'],
-			'payload'        => ['required', Rule::notIn(['[]'])],
+			'invoice_cart'        => ['required', Rule::notIn(['[]'])],
 			'name'           => ['required', 'string'],
-			'address'        => ['string', "nullable"],
 			'email'          => ['email', "nullable"],
 			'phone'          => ['string', "nullable"],
-			'country'        => ['string', "nullable"],
+			'address'        => ['string', "nullable"],
 			'province'       => ['string', "nullable"],
+			'country'        => ['string', "nullable"],
 			'tax_region'     => ['required', 'exists:tax_regions,id'],
 			'notes'          => ['string', "nullable"],
-			'payload.*.description'          => ['string', "required"],
+			/* 'invoice_cart.*.description'          => ['string', "required"], */
 		]);
 
 		//Validate Invoice Row
-		/* $data = json_decode($request->payload, true);
+		$invoice_rows = json_decode($request->invoice_cart, true);
 
-		$validator = Validator::make($data, [
+		$validator = Validator::make($invoice_rows, [
 			'*.description' => 'required|string',
 			'*.price'       => 'required',
 			'*.discount'    => 'string|nullable',
@@ -99,21 +99,77 @@ class InvoiceController extends Controller
 		
 		if ($validator->fails()) {
 			return redirect()
-			->route('invoices.create')
-			->withErrors($validator, 'cart')
-			->withInput();
-        } */
+				->route('invoices.create')
+				->withErrors($validator, 'cart')
+				->withInput();
+		}
 
 		dd(request());
 
 		//Create Customer
-		$customer = request()->customer;
-		
+		$customers  = Customer::where([
+			['name', request('name')],
+			['tax_region', request('tax_region')]
+		])
+		->where(function ($query) {
+			$query->where('address', request('address'))
+			->orWhere('email', request('email'))
+			->orWhere('phone', request('phone'))
+			->orWhere('province', request('province'))
+			->orWhere('country', request('country'));
+		})->get();
+
+		switch ($customers->count()) {
+			case 0:
+				//Make new customer
+				$customer = new Customer;
+				$customer->address = request('address');
+				$customer->email = request('email');
+				$customer->phone = request('phone');
+				$customer->province = request('province');
+				$customer->country = request('country');
+				$customer->store();
+				break;
+			case 1:
+				$customer = $customers->first();
+				break;
+			default:
+				return redirect()
+					->route('invoices.create')
+					->withErrors('Customer find fail')
+					->withInput();
+				break;
+		}
+
 		//Create Invoice
+		$invoice = new Invoice;
+		$invoice->invoice_number;
+		$invoice->company_id = request('company_id');
+		$invoice->status = request('status');
+		$invoice->salesperson_id = request('salesperson_id');
+		$invoice->notes = request('notes');
+		$invoice->customer_id = request('customer_id');
+		$invoice->shipping_handling = request('shipping_handling');
+		$invoice->discount_string = request('discount_string');
+		$invoice->discount_value = request('discount_value');
+
+		if (Status::find(request('status'))->name === 'Completed') {
+			$invoice->completed_at = request('completed_at');
+		}
+		if (Status::find(request('status'))->name === 'Paid') {
+			$invoice->completed_at = now();
+			$invoice->paid_at = now();
+		}
+		$invoice->store();
+
 		/* $invoice = Invoice::create([
 			request()->validated()
+			'customer_id'->$customer->id
 		]); */
-//Create Invoice Rows
+
+		foreach ($invoice_rows as $invoice_row) {
+		}
+		//Create Invoice Rows
 		/* foreach ($data as $invoice_row) {
 			InvoiceRow::create([
 				'invoice_id' => request()->id,

@@ -18,6 +18,23 @@ const twoDigitString = (num) => parseFloat(num).toFixed(2);
 const money = (num) => '$' + twoDigitString(num);
 
 
+
+document.querySelectorAll('#button_submit').forEach(btn => {
+	btn.addEventListener('click', (e) => {
+		
+		console.log('submit');
+		console.log(e);
+		//document.querySelector('#invoice_form').submit();
+
+	});
+});
+
+
+document.querySelector('#button_cancel').addEventListener('click', () => {
+	console.log('invoice-route', invoice_route);
+});
+
+
 let len = 0;
 
 document.addEventListener("alpine:init", () => {
@@ -28,7 +45,7 @@ document.addEventListener("alpine:init", () => {
 			this.customer_list     = [],
 			this.cart              = old_cart,
 			this.invoice_discount  = old_invoice_discount ? old_invoice_discount : '',
-			this.shipping_handling = old_shipping_handling ? old_shipping_handling : 0,
+			this.shipping_handling = old_shipping_handling && old_shipping_handling,
 			this.invoice_cart      = old_cart ? old_cart : '',
 			this.new_cart_row      = {},
 			this.current_customer  = {
@@ -38,11 +55,10 @@ document.addEventListener("alpine:init", () => {
 				email      : old_email ? old_email           : '',
 				phone      : old_phone ? old_phone           : '',
 				province   : old_province ? old_province     : '',
-				tax_region : old_tax_region ? old_tax_region : '',
+				tax_region : old_tax_region ? old_tax_region : 0,
 			}
 			if (old_tax_region) {
 				this.taxes = taxes.find(tax => tax.id === parseInt(old_tax_region)).tax;
-				console.log('t',this.taxes);
 			}
 		},
 
@@ -56,6 +72,11 @@ document.addEventListener("alpine:init", () => {
 				body: JSON.stringify({'id': region_id})
 			});
 			this.taxes = await response.json();
+		},
+
+		changeTax(e) {
+			this.current_customer = {...this.current_customer, tax_region: parseInt(e.target.value) };
+			this.taxes = taxes.find(tax => tax.id === parseInt(this.current_customer.tax_region)).tax;
 		},
 
 		async searchCustomers({target: {value : name}}) {
@@ -76,10 +97,14 @@ document.addEventListener("alpine:init", () => {
 		selectCustomer(id) {
 			this.current_customer = this.customer_list.find(customer => customer.id === id);
 			this.show_suggestions = false;
-			document.querySelector('#tax_region').selectedIndex = this.current_customer.tax_region - 1;
-			this.taxes = taxes.find(tax => tax.id === this.current_customer.tax_region).tax;
+			document.querySelector('#tax_region').value = parseInt(this.current_customer.tax_region);
+			this.taxes = taxes.find(tax => tax.id === parseInt(this.current_customer.tax_region)).tax;
 			console.log('tax', this.taxes);
 			/* this.searchTax({target : {value : this.current_customer.tax_region}}); */
+		},
+
+		getTaxName(regionId) {
+			return taxes.find(tax => tax.id === regionId).name	
 		},
 
 		unselect() { this.show_suggestions = false; },
@@ -102,12 +127,18 @@ document.addEventListener("alpine:init", () => {
 			this.invoice_cart = JSON.stringify(this.cart);
 		},
 
+		removeCartRow(cart_row) {
+			this.cart.splice(this.cart.indexOf(cart_row), 1);
+			this.invoice_cart = JSON.stringify(this.cart);
+		},
+
 		calculateTotal(price = 0.00, discount, quantity = 0) {
 			if (!discount || discount === 0) { return price * quantity; }
 			return twoDigitFloat(this.calculateDiscount(price, discount) * quantity) || 0;
 		},
 
 		calculateDiscount(price, discount = '$0') {
+			if (!discount) { return twoDigitFloat(price); }
 			let discount_value = parseFloat(discount.replace(/^\D|,+/g, ''));
 			if (discount.includes('%')) {
 				return twoDigitFloat(price * (1 - (discount_value)/100)) || 0;
@@ -120,7 +151,7 @@ document.addEventListener("alpine:init", () => {
 
 		beforeTax() {
 			//return this.grossTotal() + this.shipping_handling;
-			return twoDigitFloat(this.calculateDiscount((this.grossTotal() + this.shipping_handling), this.invoice_discount));
+			return twoDigitFloat(this.calculateDiscount((this.grossTotal() + parseFloat(this.shipping_handling || 0)), this.invoice_discount));
 		},
 
 		taxTotal() {
@@ -131,9 +162,6 @@ document.addEventListener("alpine:init", () => {
 			return twoDigitFloat(this.beforeTax() * (1 + this.taxTotal()));
 		},
 
-		removeCartRow(cart_row) {
-			this.cart.splice(this.cart.indexOf(cart_row), 1);
-			this.invoice_cart = JSON.stringify(this.cart);
-		},
+		
 	}));
 });

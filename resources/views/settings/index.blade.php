@@ -1,7 +1,7 @@
 @extends('layout')
 
 @push('head_scripts')
-	<script>
+	<script data-cfasync="false">
 		const tax_regions = {{ Js::from($tax_regions) }};
 		const tax_rates = {{ Js::from($taxes) }};
 		const statuses = {{ Js::from($statuses) }};
