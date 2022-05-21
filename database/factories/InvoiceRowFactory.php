@@ -18,7 +18,7 @@ class InvoiceRowFactory extends Factory
 		$price          = $this->faker->randomFloat($nbMaxDecimals = 2, $min = 50, $max = 1000);
 		$quantity       = $this->faker->numberBetween($min = 1, $max = 3);
 		$discountSign   = $hasDiscount ? $this->faker->randomElement(['$', '%']) : null;
-		$discountString = $hasDiscount ?  $this->generateDiscount($discountSign) : null;
+		$discountString = $hasDiscount ?  $this->generateDiscount($discountSign) : '$0';
 
 		return [
 			'invoice_id'  => \App\Models\Invoice::inRandomOrder()->take(1)->value('id'),
