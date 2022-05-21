@@ -19,20 +19,16 @@ class InvoiceFactory extends Factory
 		$discountStringValue = $hasDiscount ? $this->faker->randomFloat($nbMaxDecimals = 2, $min = 0, $max = 100) : null;
 
         return [
-            'invoice_number' => date("y").str_pad($this->faker->unique(true)->numberBetween($min = 1, $max = 10000), 6, '0', STR_PAD_LEFT),
-            //'status'          => $this->faker->randomElement(['Draft', 'Completed', 'Paid', 'Deleted']),
+			'invoice_number' => date("y") . str_pad($this->faker->unique(true)->numberBetween($min = 1, $max = 10000), 6, '0', STR_PAD_LEFT),
             'status_id'         => \App\Models\Status::inRandomOrder()->take(1)->value('id'),
             'company_id'        => \App\Models\Company::inRandomOrder()->take(1)->value('id'),
             'salesperson_id'    => \App\Models\User::inRandomOrder()->take(1)->value('id'),
             'customer_id'       => \App\Models\Customer::inRandomOrder()->take(1)->value('id'),
             'notes'             => $hasNotes ? implode(', ', $this->faker->sentences($nb = 3, $asText = false)) : null,
             'shipping_handling' => $this->faker->randomFloat($nbMaxDecimals = 2, $min = 0, $max = 100),
-            'discount_string'   => $hasDiscount ? ( $discountSign === '$' ? $discountSign.$discountStringValue : $discountStringValue.$discountSign) : null,
-            'discount_value'    => $hasDiscount ? $this->faker->randomFloat($nbMaxDecimals = 2, $min = 0, $max = 100) : null,
+			'discount'   => $hasDiscount ? ($discountSign === '$' ? $discountSign . $discountStringValue : $discountStringValue . $discountSign) : null,
             'completed_at'      => now(),
             'paid_at'           => now()
         ];
-    }
-
-
+	}
 }

@@ -16,15 +16,14 @@ class CreateInvoicesTable extends Migration
         Schema::create('invoices', function (Blueprint $table) {
 			$table->id();
 			$table->unsignedInteger('invoice_number')->unique();
-			$table->unsignedTinyInteger('company_id');
-            $table->timestamps();
 			$table->unsignedTinyInteger('status_id');
+			$table->unsignedTinyInteger('company_id');
 			$table->unsignedTinyInteger('salesperson_id');
 			$table->unsignedInteger('customer_id');
 			$table->text('notes')->nullable()->nullable();
 			$table->unsignedFloat('shipping_handling')->nullable();
 			$table->string('discount')->nullable();
-			$table->unsignedFloat('net_total')->nullable();
+			$table->timestamps();
 			$table->timestamp('completed_at')->nullable();
 			$table->timestamp('paid_at')->nullable();
         });

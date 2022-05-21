@@ -182,6 +182,18 @@ class InvoiceController extends Controller
 
 		$invoice_nettotal = ($invoice_grosstotal + request('shipping_handling') - $invoice_discount) * (1 + $invoice_tax);
 
+
+/* 
+private function calculateDiscount($price, $quantity, $discountString) {
+		$discountValue = (float)preg_match('/[0-9]+\.?[0-9]+/', $discountString, $out) ? $out[0] : 0.00;
+		if (str_contains($discountString, '$')) {
+			return $discountValue;
+		} else {
+			return $price * $quantity * ($discountValue/100);
+		}
+	}
+*/
+
 		$invoice->company_id = request('company_id');
 		$invoice->status = request('status');
 		$invoice->salesperson_id = request('salesperson_id');

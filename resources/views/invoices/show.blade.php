@@ -113,7 +113,7 @@
 						</x-table.table-data>
 						<x-table.table-data class="md:text-right col-start-2 col-end-3 row-start-2 row-end-3 px-2 py-4 text-xl">
 							<span class="border-b-2 pb-1 text-sm text-gray-900 md:hidden">Discount</span>
-							<span class="px-2 pt-2">{{ $invoice_row->discount_string ?? '-' }}</span>
+							<span class="px-2 pt-2">{{ $invoice_row->discount ?? '-' }}</span>
 						</x-table.table-data>
 						<x-table.table-data class="md:text-center col-start-1 col-end-2 row-start-3 row-end-4 px-2 py-4 text-xl">
 							<span class="border-b-2 pb-1 text-sm text-gray-900 md:hidden">Quantity</span>
@@ -121,7 +121,7 @@
 						</x-table.table-data>
 						<x-table.table-data class="md:text-center col-start-2 col-end-3 row-start-3 row-end-4 px-2 py-4 text-xl">
 							<span class="border-b-2 pb-1 text-sm text-gray-900 md:hidden">Refunded</span>
-							<span class="px-2 pt-2">{{ $invoice_row->refund_quantity ?? '-' }}</span>
+							<span class="px-2 pt-2">{{ $invoice_row->refund ?? '-' }}</span>
 						</x-table.table-data>
 						<x-table.table-data class="col-start-1 col-end-3 row-start-4 row-end-5 px-2 py-0 pb-4 text-center text-xl md:py-4 md:text-right">
 							<span class="border-b-2 pb-1 text-sm text-gray-900 md:hidden">Total</span>
@@ -145,7 +145,7 @@
 				</tr>
 				<tr class="contents md:table-row hover:bg-gray-200">
 					<th scope="row" class="col-span-2 mx-5 text-lg font-medium text-right w-1/2">Invoice Discount</th>
-					<td class="col-span-2 text-right text-xl md:table-cell px-4">{{ FormatOutput::moneyFormat($invoice->discount_string) ?? FormatOutput::moneyFormat(0.00) }}</td>
+					<td class="col-span-2 text-right text-xl md:table-cell px-4">{{ FormatOutput::moneyFormat($invoice->discount) ?? FormatOutput::moneyFormat(0.00) }}</td>
 				</tr>
 				<tr class="contents border-b-2 md:table-row hover:bg-gray-200">
 					<th scope="row" class="col-span-2 mx-5 text-lg font-medium text-right w-1/2">Before Tax</th>
@@ -185,7 +185,7 @@
 				<p class="col-span-2 flex flex-col text-center text-lg md:col-span-1"><span class="block bg-gray-100 p-1 text-sm md:hidden">Price</span><span class="p-2 md:before:content-[''] before:content-['$']"> {{ FormatOutput::moneyFormat($invoice_row->price) }}</span></p>
 				<p class="col-span-2 flex flex-col text-center text-lg md:col-span-1"><span class="block bg-gray-100 p-1 text-sm md:hidden">Discount</span><span class="p-2">{{ $invoice_row->discount_string ?? '-' }}</span></p>
 				<p class="col-span-2 flex flex-col text-center text-lg md:col-span-1"><span class="block bg-gray-100 p-1 text-sm md:hidden">Quantity</span><span class="p-2">{{ $invoice_row->quantity }}</span></p>
-				<p class="col-span-2 flex flex-col text-center text-lg md:col-span-1"><span class="block bg-gray-100 p-1 text-sm md:hidden">Refunded</span><span class="p-2">{{ $invoice_row->refund_quantity ?? '-' }}</span></p>
+				<p class="col-span-2 flex flex-col text-center text-lg md:col-span-1"><span class="block bg-gray-100 p-1 text-sm md:hidden">Refunded</span><span class="p-2">{{ $invoice_row->refund ?? '-' }}</span></p>
 				<p class="col-span-4 flex flex-col text-center text-lg md:col-span-1 md:text-right"><span class="block bg-gray-100 p-1 text-sm md:hidden">Total</span><span class="p-2 md:before:content-[''] before:content-['$']"> {{ FormatOutput::moneyFormat($invoice_row->total) }}</span></p>
 			@endunless
 		@endforeach
@@ -194,7 +194,7 @@
 		<div class="col-span-2 mx-5 text-center text-lg font-medium md:col-span-7 md:text-right">Shipping &amp; Handling</div>
 		<div class="col-span-2 text-right text-xl md:col-span-1">{{ FormatOutput::moneyFormat($invoice->shipping_handling) ?? FormatOutput::moneyFormat(0.00) }}</div>
 		<div class="col-span-2 mx-5 text-center text-lg font-medium md:col-span-7 md:text-right">Invoice Discount</div>
-		<div class="col-span-2 text-right text-xl md:col-span-1">{{ FormatOutput::moneyFormat($invoice->discount_string) ?? FormatOutput::moneyFormat(0.00) }}</div>
+		<div class="col-span-2 text-right text-xl md:col-span-1">{{ FormatOutput::moneyFormat($invoice->discount) ?? FormatOutput::moneyFormat(0.00) }}</div>
 		<div class="col-span-2 mx-5 text-center text-lg font-medium md:col-span-7 md:text-right">Before Tax</div>
 		<div class="col-span-2 text-right text-xl md:col-span-1"><span class="float-left mr-5">$</span>{{ FormatOutput::moneyFormat($invoice->before_tax) }}</div>
 		@foreach ($invoice->customer->tax as $tax)

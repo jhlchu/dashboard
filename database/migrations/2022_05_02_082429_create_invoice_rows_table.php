@@ -19,8 +19,8 @@ class CreateInvoiceRowsTable extends Migration
 			$table->tinyText('description');
 			$table->unsignedFloat('price');
 			$table->unsignedTinyInteger('quantity');
-			$table->string('discount_string')->nullable();
-			$table->unsignedTinyInteger('refund_quantity')->nullable();
+			$table->string('discount')->nullable();
+			$table->unsignedTinyInteger('refund')->nullable();
 			$table->boolean('deleted');
 		});
     }
