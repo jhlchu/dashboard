@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -20,5 +21,12 @@ class Customer extends Model
 
 	public function tax() {
 		return $this->hasManyThrough(Tax::class, TaxRegion::class, 'id', 'region_id', 'tax_region', 'id');
+	}
+
+	protected function tax_region(): Attribute
+	{
+		return Attribute::make(
+			set: fn ($value) => intval($value)
+		);
 	}
 }

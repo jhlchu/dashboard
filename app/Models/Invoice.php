@@ -60,7 +60,7 @@ class Invoice extends Model
 	{
 		$total = ($this->invoice_row)->reduce(
 			function ($temp, $item) {
-				return $temp + FormatOutput::moneyFormat($item->total);
+				return $temp + $item->total;
 			},
 			0
 		);
@@ -74,7 +74,8 @@ class Invoice extends Model
 
 	public function getBeforeTaxAttribute() {
 		/* return $this->gross_total + $this->shipping_handling - FormatOutput::moneyFormat($this->discount); */
-		return $this->gross_total + $this->shipping_handling - $this->discount;
+
+		return $this->gross_total + $this->shipping_handling - $this->discount_value;
 	}
 
 	public function getTaxTotalAttribute() {
@@ -91,11 +92,16 @@ class Invoice extends Model
 		return $this->before_tax * (1 + $this->tax_total);
 	}
 
-	public function getDiscountStringAttribute()
+	public function getDiscountValueAttribute()
 	{
-		return $this->discount;
+		$discount_value = preg_match('/[0-9]+\.?[0-9]*/', $this->discount, $out) ? floatVal($out[0]) : 0.00;
+		if (str_contains($this->discount, '%')) {
+			return ($this->gross_total + $this->shipping_handling) * ($discount_value / 100);
+		} else {
+			return $discount_value;
+		}
 	}
-
+/* 
 	protected function discount(): Attribute
 	{
 		return Attribute::make(
@@ -109,7 +115,7 @@ class Invoice extends Model
 			}
 		);
 	}
-
+ */
 	protected function invoice_number(): Attribute
 	{
 		return Attribute::make(

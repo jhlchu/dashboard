@@ -10,7 +10,7 @@
 
 	<form action="{{ route('invoices.pdf', ['invoice' => $invoice]) }}" method="POST">
 		@csrf
-		<button class="m-1 mx-1 flex-grow basis-1/3 rounded border-2 py-1 px-3 text-base font-medium text-gray-700 hover:bg-yellow-500 hover:text-white md:flex-grow-0 md:basis-1/5">PDF</button>
+		<button class="m-1 mx-1 flex-grow basis-1/3 rounded border-2 py-1 px-3 text-base font-medium text-gray-700 hover:bg-yellow-300 hover:text-white md:flex-grow-0 md:basis-1/5">PDF</button>
 	</form>
 	@if ($invoice->status->name === 'Deleted')
 		<button class="m-1 mx-1 flex-grow basis-1/3 rounded border-2 py-1 px-3 text-base font-medium text-gray-700 hover:bg-blue-500 hover:text-white md:flex-grow-0 md:basis-1/5">Restore</button>
@@ -19,7 +19,7 @@
 		<button class="m-1 mx-1 flex-grow basis-1/3 rounded border-2 py-1 px-3 text-base font-medium text-gray-700 hover:bg-red-500 hover:text-white md:flex-grow-0 md:basis-1/5">Delete</button>
 	@endif
 </div>
-<div class="m-3 mt-[4.5rem] flex flex-col max-w-[80%] m-auto">
+<div class="m-auto mt-[4.5rem] flex flex-col max-w-[80%]">
 	{{-- <p>Request Pass: {{ $request }}</p> --}}
 	<div class="flex justify-between flex-row">
 			<div class="flex flex-col">
@@ -60,11 +60,11 @@
 		</div>
 		<div class="flex-grow text-center">
 			<p class="border-b-2 text-center font-bold">Email</p>
-			<p>{{ $invoice->customer->email ?? '-' }}</p>
+			<p><a href='email:{{ $invoice->customer->email }}'>{{ $invoice->customer->email ?? '-' }}</a></p>
 		</div>
 		<div class="flex-grow text-center">
 			<p class="border-b-2 text-center font-bold">Phone</p>
-			<p>{{ $invoice->customer->phone ?? '-' }}</p>
+			<p><a href='tel:{{ $invoice->customer->phone }}'>{{ $invoice->customer->phone ?? '-' }}</a></p>
 		</div>
 		<div class="flex-grow text-center">
 			<p class="border-b-2 text-center font-bold">Tax Region</p>
@@ -74,7 +74,7 @@
 	<div class="mb-3 flex flex-col justify-evenly md:my-3 md:flex-row">
 		<div class="flex-grow text-center">
 		<p class="border-b-2 text-center font-bold">Address</p>
-		<p>{{ $invoice->customer->address ?? '-' }}</p>
+		<p><a href='https://maps.google.com/?q={{ $invoice->customer->address }}'>{{ $invoice->customer->address ?? '-' }}</a></p>
 		</div>
 		<div class="flex-grow text-center">
 		<p class="border-b-2 text-center font-bold">Province/State</p>
@@ -141,11 +141,11 @@
 				</tr>
 				<tr class="contents md:table-row hover:bg-gray-200">
 					<th scope="row" class="col-span-2 mx-5 text-lg font-medium text-right w-1/2">Shipping &amp; Handling</th>
-					<td class="col-span-2 text-right text-xl md:table-cell px-4">{{ FormatOutput::moneyFormat($invoice->shipping_handling) ?? FormatOutput::moneyFormat(0.00) }}</td>
+					<td class="col-span-2 text-right text-xl md:table-cell px-4">{{ FormatOutput::moneyFormat($invoice->shipping_handling) ?? 0.00 }}</td>
 				</tr>
 				<tr class="contents md:table-row hover:bg-gray-200">
 					<th scope="row" class="col-span-2 mx-5 text-lg font-medium text-right w-1/2">Invoice Discount</th>
-					<td class="col-span-2 text-right text-xl md:table-cell px-4">{{ FormatOutput::moneyFormat($invoice->discount) ?? FormatOutput::moneyFormat(0.00) }}</td>
+					<td class="col-span-2 text-right text-xl md:table-cell px-4">{{ $invoice->discount ?? 0.00 }}</td>
 				</tr>
 				<tr class="contents border-b-2 md:table-row hover:bg-gray-200">
 					<th scope="row" class="col-span-2 mx-5 text-lg font-medium text-right w-1/2">Before Tax</th>
@@ -183,7 +183,7 @@
 			@unless ($invoice_row->deleted)
 				<p class="col-span-4 flex flex-col text-lg md:col-span-3"><span class="block bg-gray-100 p-1 text-sm md:hidden">Description</span><span class="p-2">{{ $invoice_row->description }}</span></p>
 				<p class="col-span-2 flex flex-col text-center text-lg md:col-span-1"><span class="block bg-gray-100 p-1 text-sm md:hidden">Price</span><span class="p-2 md:before:content-[''] before:content-['$']"> {{ FormatOutput::moneyFormat($invoice_row->price) }}</span></p>
-				<p class="col-span-2 flex flex-col text-center text-lg md:col-span-1"><span class="block bg-gray-100 p-1 text-sm md:hidden">Discount</span><span class="p-2">{{ $invoice_row->discount_string ?? '-' }}</span></p>
+				<p class="col-span-2 flex flex-col text-center text-lg md:col-span-1"><span class="block bg-gray-100 p-1 text-sm md:hidden">Discount</span><span class="p-2">{{ $invoice_row->discount ?? '-' }}</span></p>
 				<p class="col-span-2 flex flex-col text-center text-lg md:col-span-1"><span class="block bg-gray-100 p-1 text-sm md:hidden">Quantity</span><span class="p-2">{{ $invoice_row->quantity }}</span></p>
 				<p class="col-span-2 flex flex-col text-center text-lg md:col-span-1"><span class="block bg-gray-100 p-1 text-sm md:hidden">Refunded</span><span class="p-2">{{ $invoice_row->refund ?? '-' }}</span></p>
 				<p class="col-span-4 flex flex-col text-center text-lg md:col-span-1 md:text-right"><span class="block bg-gray-100 p-1 text-sm md:hidden">Total</span><span class="p-2 md:before:content-[''] before:content-['$']"> {{ FormatOutput::moneyFormat($invoice_row->total) }}</span></p>
@@ -192,9 +192,9 @@
 		<div class="col-span-2 mx-5 text-center text-lg font-medium md:col-span-7 md:text-right">Gross Total</div>
 		<div class="col-span-2 text-right text-xl md:col-span-1"><span class="float-left mr-5">$</span>{{ FormatOutput::moneyFormat($invoice->gross_total) }}</div>
 		<div class="col-span-2 mx-5 text-center text-lg font-medium md:col-span-7 md:text-right">Shipping &amp; Handling</div>
-		<div class="col-span-2 text-right text-xl md:col-span-1">{{ FormatOutput::moneyFormat($invoice->shipping_handling) ?? FormatOutput::moneyFormat(0.00) }}</div>
+		<div class="col-span-2 text-right text-xl md:col-span-1">{{ FormatOutput::moneyFormat($invoice->shipping_handling) ?? 0.00 }}</div>
 		<div class="col-span-2 mx-5 text-center text-lg font-medium md:col-span-7 md:text-right">Invoice Discount</div>
-		<div class="col-span-2 text-right text-xl md:col-span-1">{{ FormatOutput::moneyFormat($invoice->discount) ?? FormatOutput::moneyFormat(0.00) }}</div>
+		<div class="col-span-2 text-right text-xl md:col-span-1">{{ $invoice->discount ?? 0.00 }}</div>
 		<div class="col-span-2 mx-5 text-center text-lg font-medium md:col-span-7 md:text-right">Before Tax</div>
 		<div class="col-span-2 text-right text-xl md:col-span-1"><span class="float-left mr-5">$</span>{{ FormatOutput::moneyFormat($invoice->before_tax) }}</div>
 		@foreach ($invoice->customer->tax as $tax)

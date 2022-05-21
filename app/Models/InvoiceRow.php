@@ -15,18 +15,29 @@ class InvoiceRow extends Model
 	protected $casts = [
 		'deleted' => 'boolean',
 	];
-
+	/* 
 	public function getDiscountStringAttribute()
 	{
+		dump($this->discount);
 		return $this->discount;
+	} */
+
+	public function getDiscountValueAttribute()
+	{
+		$discount_value = preg_match('/[0-9]+\.?[0-9]*/', $this->discount, $out) ? floatVal($out[0]) : 0.00;
+		if (str_contains($this->discount, '%')) {
+			return $this->price * ($discount_value / 100);
+		} else {
+			return $discount_value;
+		}
 	}
 
 	public function getTotalAttribute()
 	{
-		return FormatOutput::moneyFormat(($this->price - $this->discount) * ($this->quantity - $this->refund));
+		return ($this->price - $this->discount_value) * ($this->quantity - $this->refund);
 	}
 
-	protected function discount(): Attribute
+	/* protected function discount(): Attribute
 	{
 		return Attribute::make(
 			get: function ($discount_string) {
@@ -38,5 +49,5 @@ class InvoiceRow extends Model
 				}
 			}
 		);
-	}
+	} */
 }

@@ -107,27 +107,30 @@ class InvoiceController extends Controller
 				->withInput();
 		}
 
+		dd(request());
+
 		//Create Customer
 		$customers = Customer::where(function ($query) {
 			$query->where('name', request('name'))
 			->where('tax_region', request('tax_region'));
 		})->where(function ($query) {
-			$query->when(request('address'), fn ($query) => $query->orWhere('address', request('address')))
-				->when(request('email'), fn ($query) => $query->orWhere('email', request('email')))
-				->when(request('phone'), fn ($query) => $query->orWhere('phone', request('phone')))
-				->when(request('province'), fn ($query) => $query->orWhere('province', request('province')))
-				->when(request('country'), fn ($query) => $query->orWhere('country', request('country')));	
+			$query->when(request('address'), fn ($query) => $query->where('address', request('address')))
+				->when(request('email'), fn ($query) => $query->where('email', request('email')))
+				->when(request('phone'), fn ($query) => $query->where('phone', request('phone')))
+				->when(request('province'), fn ($query) => $query->where('province', request('province')))
+				->when(request('country'), fn ($query) => $query->where('country', request('country')));	
 		})->get();
 
 		$customer = new Customer;
 		switch ($customers->count()) {
-			case 0:
-				//Make new customer
-				$customer->address  = request('address');
-				$customer->email    = request('email');
-				$customer->phone    = request('phone');
-				$customer->province = request('province');
-				$customer->country  = request('country');
+			case 0: //Make new customer
+				$customer->tax_region = request('tax_region');
+				$customer->name       = request('name');
+				$customer->email      = request('email') ?? null;
+				$customer->phone      = request('phone') ?? null;
+				$customer->address    = request('address') ?? null;
+				$customer->province   = request('province') ?? null;
+				$customer->country    = request('country') ?? null;
 				$customer->save();
 				break;
 			case 1:
@@ -162,8 +165,8 @@ class InvoiceController extends Controller
 		$invoice->status_id         = request('status_id');
 		$invoice->salesperson_id    = request('salesperson_id');
 		$invoice->notes             = request('notes');
-		$invoice->shipping_handling = request('shipping_handling');
-		$invoice->discount          = request('discount');
+		$invoice->shipping_handling = request('shipping_handling') ?? 0;
+		$invoice->discount          = request('discount') ?? '$0';
 
 		if (Status::find(request('status_id'))->name === 'Completed') {
 			$invoice->completed_at = now();

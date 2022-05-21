@@ -18,10 +18,10 @@ class CreateCustomersTable extends Migration
 			$table->unsignedTinyInteger('tax_region');
 			$table->string('name');
 			$table->string('email')->nullable();
+			$table->string('phone')->nullable();
 			$table->string('address')->nullable();
 			$table->string('province')->nullable();
 			$table->string('country')->nullable();
-			$table->string('phone')->nullable();
 			$table->timestamps();
 		});
     }

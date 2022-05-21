@@ -14,7 +14,6 @@
 		const old_cart              = JSON.parse('{!! old('invoice_cart') ?? "[]" !!}');
 		const old_shipping_handling = "{{ old('shipping_handling') ?? null }}";
 		const old_invoice_discount  = "{{ old('discount') ?? null }}";
-		const old_notes  = "{{ old('notes') ?? null }}";
 
 		const taxes = {{ Js::from($taxes) }};
 		const invoice_route = '{{ route("invoices.index") }}';
@@ -197,7 +196,7 @@
 									<td class='py-3'><p class="text-right">Gross Total</p></td>
 									<td class='py-3'><p class="text-right" x-text="money(grossTotal())"></p></td>
 								</tr>
-								<tr>
+								<tr x-on:keydown.prevent.enter="">
 									<td class='py-3'><p class="text-right" ><span class="material-symbols-outlined mr-2">local_shipping</span>Shipping & Handling</p></td>
 									<td class='py-3'>
 										<div class='ml-3'>
@@ -213,7 +212,7 @@
 										</div>
 									</td>
 								</tr>
-								<tr>
+								<tr x-on:keydown.prevent.enter="">
 									{{-- <td><input type="text" name="discount_string" placeholder="$ or %" x-model="invoice_discount" /></td> --}}
 									<td class='py-3'><p class="text-right" ><span class="material-symbols-outlined mr-2">sell</span>Invoice Discount</p></td>
 									<td class='py-3'>
@@ -250,21 +249,21 @@
 			</div>
 			</div>
 			<h2 class="border-b-2 border-gray-700 text-lg p-3 mb-2 font-medium">Notes</h2>
-			<textarea class="border-2 border-gray-300 rounded-lg p-3 my-3 w-full mb-20" type="text" rows="10" placeholder="Enter notes here."></textarea>
-			<div class="fixed bottom-0 left-0 right-0 py-3 bg-gray-200 shadow">
-			<div class="flex flex-row justify-center">
-				@foreach ($statuses as $status)
-					<button id="button_submit" class="text-white {{ $status->color }}-700 hover:{{ $status->color }}-800 focus:ring-4 focus:outline-none focus:bg-{{ $status->color }}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 w-[250px]" name="status_id" value="{{ $status->id }}" @click.prevent="">
-						<span class="material-symbols-outlined">{{ $status->icon }}</span>{{ $status->name }}
+			<textarea class="border-2 border-gray-300 rounded-lg p-3 my-3 w-full mb-20" type="text" rows="10" name="notes" placeholder="Enter notes here.">{{ old('notes') }}</textarea>
+			<div class="fixed bottom-0 left-0 right-0 py-3 bg-gray-100 shadow-lg shadow-black">
+				<div class="flex flex-row justify-center">
+					@foreach ($statuses as $status)
+						<button id="button_submit" class="text-white {{ $status->color }}-700 hover:{{ $status->color }}-800 focus:ring-4 focus:outline-none focus:bg-{{ $status->color }}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 w-[250px]" name="status_id" value="{{ $status->id }}" @click.prevent="">
+							<span class="material-symbols-outlined">{{ $status->icon }}</span>{{ $status->name }}
+						</button>
+						{{-- @if (preg_match("(Draft|Completed|Paid)", $status->name) === 1) --}}{{-- @endif --}}
+					@endforeach
+					<a id="button_cancel" class="cursor-pointer text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none w-[250px] focus:bg-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2" ><span class="material-symbols-outlined">cancel</span>Cancel</a>
+					<button id="button_cancel" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none w-[250px] focus:bg-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2" name="status" value="cancel">
+						<span class="material-symbols-outlined">cancel</span>Cancel
 					</button>
-					{{-- @if (preg_match("(Draft|Completed|Paid)", $status->name) === 1) --}}{{-- @endif --}}
-				@endforeach
-				<a id="button_cancel" class="cursor-pointer text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none w-[250px] focus:bg-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2" ><span class="material-symbols-outlined">cancel</span>Cancel</a>
-				<button id="button_cancel" class="text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:outline-none w-[250px] focus:bg-red-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2" name="status" value="cancel">
-					<span class="material-symbols-outlined">cancel</span>Cancel
-				</button>
+				</div>
 			</div>
-		</div>
 		</form>
 		
 	</div>
