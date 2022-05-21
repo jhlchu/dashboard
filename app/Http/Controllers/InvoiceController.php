@@ -70,20 +70,22 @@ class InvoiceController extends Controller
 		}
 
 		//Validate Invoice
-		request()->validate(['company_id'        => ['required', 'exists:companies,id'],
-			'status'            => ['required', 'exists:statuses,id'],
-			'salesperson_id'    => ['required', 'exists:users,id'],
-			'invoice_cart'      => ['required', Rule::notIn(['[]'])],
-			'name'              => ['required', 'string'],
-			'email'             => ['email', "nullable"],
-			'phone'             => ['string', "nullable"],
-			'address'           => ['string', "nullable"],
-			'province'          => ['string', "nullable"],
-			'country'           => ['string', "nullable"],
-			'tax_region'        => ['required', 'exists:tax_regions,id'],
-			'notes'             => ['string', "nullable"],
-			'shipping_handling' => ['digit', "nullable"],
-			'discount'          => ['string', "nullable"]
+		request()->validate(
+			[
+				'company_id'        => ['required', 'exists:companies,id'],
+				'status_id'         => ['required', 'exists:statuses,id'],
+				'salesperson_id'    => ['required', 'exists:users,id'],
+				'invoice_cart'      => ['required', Rule::notIn(['[]'])],
+				'name'              => ['required', 'string'],
+				'email'             => ['email', 'nullable'],
+				'phone'             => ['string', 'nullable'],
+				'address'           => ['string', 'nullable'],
+				'province'          => ['string', 'nullable'],
+				'country'           => ['string', 'nullable'],
+				'tax_region'        => ['required', 'exists:tax_regions,id'],
+				'notes'             => ['string', 'nullable'],
+				'shipping_handling' => ['digit', 'nullable'],
+				'discount'          => ['string', 'nullable']
 			/* 'invoice_cart.*.description'          => ['string', "required"], */
 		]);
 
@@ -105,34 +107,27 @@ class InvoiceController extends Controller
 				->withInput();
 		}
 
-		dd(request());
-
 		//Create Customer
 		$customers = Customer::where(function ($query) {
 			$query->where('name', request('name'))
 			->where('tax_region', request('tax_region'));
-		})->where(
-			function ($query) {
-			$query->where('address', request('address'))
-			->orWhere('email', request('email'))
-					->orWhere('phone', request('phone'));
-				/* ->when( request('province', function ($query) {
-						$query->where();
-					})
-					->orWhere('province', request('province'))
-					->orWhere('country', request('country'));
-				) */
+		})->where(function ($query) {
+			$query->when(request('address'), fn ($query) => $query->orWhere('address', request('address')))
+				->when(request('email'), fn ($query) => $query->orWhere('email', request('email')))
+				->when(request('phone'), fn ($query) => $query->orWhere('phone', request('phone')))
+				->when(request('province'), fn ($query) => $query->orWhere('province', request('province')))
+				->when(request('country'), fn ($query) => $query->orWhere('country', request('country')));	
 		})->get();
 
+		$customer = new Customer;
 		switch ($customers->count()) {
 			case 0:
 				//Make new customer
-				$customer = new Customer;
-				$customer->address = request('address');
-				$customer->email = request('email');
-				$customer->phone = request('phone');
+				$customer->address  = request('address');
+				$customer->email    = request('email');
+				$customer->phone    = request('phone');
 				$customer->province = request('province');
-				$customer->country = request('country');
+				$customer->country  = request('country');
 				$customer->store();
 				break;
 			case 1:
@@ -150,58 +145,18 @@ class InvoiceController extends Controller
 		$invoice = new Invoice;
 
 		/* $invoice->customer->firstOrCreate([]); */
-		$invoice->customer_id;
-
-		if (Invoice::whereYear('created_at', date("Y"))->count() === 0) {
-			$invoice->invoice_number = date("y") . str_pad(1, 6, '0', STR_PAD_LEFT); //New Year
-		} else {
-			$invoice->invoice_number = intval(Invoice::latest()->first()->value('invoice_number')) + 1; //Same Year
-		}
-
-		$invoice_grosstotal = collect($invoice_rows)->reduce(function ($total, $item) {
-			[$price, $discount, $quantity] = $item;
-			if ($discount . contains('%')) {
-				return $total + (($price * (1 - floatval($discount) / 100)) * $quantity);
-			}
-			if ($discount . contains('$')) {
-				return $total + (($price - floatval($discount)) * $quantity);
-			}
-			return $total + ($price * $quantity);
-		}, 0);
-
-		if (request('discount') . contains('%')) {
-			$invoice_discount = $invoice_grosstotal * (floatval(request('discount')) / 100);
-		}
-		if (request('discount') . contains('$')) {
-			$invoice_discount = floatval(request('discount'));
-		}
-
-		$invoice_tax = Tax::where('region_id', request('tax_region'))->get()->reduce(function ($tax_total, $tax) {
-			return $tax_total + $tax->value;
-		}, 0);
-
-		$invoice_nettotal = ($invoice_grosstotal + request('shipping_handling') - $invoice_discount) * (1 + $invoice_tax);
-
-
-/* 
-private function calculateDiscount($price, $quantity, $discountString) {
-		$discountValue = (float)preg_match('/[0-9]+\.?[0-9]+/', $discountString, $out) ? $out[0] : 0.00;
-		if (str_contains($discountString, '$')) {
-			return $discountValue;
-		} else {
-			return $price * $quantity * ($discountValue/100);
-		}
-	}
-*/
-
-		$invoice->company_id = request('company_id');
-		$invoice->status = request('status');
-		$invoice->salesperson_id = request('salesperson_id');
-		$invoice->notes = request('notes');
+		$invoice->invoice_number    = (Invoice::whereYear('created_at', date("Y"))->count() === 0) ? (date("y") . str_pad(1, 6, '0', STR_PAD_LEFT)) : (intval(Invoice::latest()->first()->value('invoice_number')) + 1);
+		$invoice->customer_id       = $customer->id;
+		$invoice->company_id        = request('company_id');
+		$invoice->status_id         = request('status_id');
+		$invoice->salesperson_id    = request('salesperson_id');
+		$invoice->notes             = request('notes');
 		$invoice->shipping_handling = request('shipping_handling');
-		$invoice->discount_string = request('discount_string');
-		$invoice->net_total = $invoice_nettotal;
+		$invoice->discount          = request('discount');
+		$invoice->store();
 
+		$invoice->completed_at = Status::find(request('status'))->name === 'Completed' && now();
+		$invoice->paid_at = Status::find(request('status'))->name === 'Paid' && now();
 		if (Status::find(request('status'))->name === 'Completed') {
 			$invoice->completed_at = request('completed_at');
 		}
@@ -209,14 +164,13 @@ private function calculateDiscount($price, $quantity, $discountString) {
 			$invoice->completed_at = now();
 			$invoice->paid_at = now();
 		}
-		$invoice->store();
 
 		foreach ($invoice_rows as $invoice_row) {
 			[$description, $price, $discount, $quantity] = $invoice_row;
 
 			$temp_row = new InvoiceRow;
 
-			$temp_row->invoice_id  = $invoice->invoice_number;
+			$temp_row->invoice_id  = $invoice->id;
 			$temp_row->description = $description;
 			$temp_row->price       = $price;
 			$temp_row->discount    = $discount;
@@ -229,66 +183,6 @@ private function calculateDiscount($price, $quantity, $discountString) {
 			'customer_id'->$customer->id
 		]); */
 
-	
-		//Create Invoice Rows
-		/* foreach ($data as $invoice_row) {
-			InvoiceRow::create([
-				'invoice_id' => request()->id,
-				'description' => ,
-				'price' => ,
-				'quantity' => ,
-				'discount_string' => ,
-				'discount_value' => ,
-				'refund_quantity' => ,
-				'deleted' => 
-			])
-		}  */
-
-
-
-		/* 
-			$input = [
-				'user' => [
-					'name' => 'Taylor Otwell',
-					'username' => 'taylorotwell',
-					'admin' => true,
-				],
-			];
-
-			Validator::make($input, [
-				'user' => 'array:username,locale',
-			]);
-		*/
-
-        //dd(request()->all());
-		/* $invoice = Invoice::create([
-			'invoice_number' => date("y").str_pad(392, 6, '0', STR_PAD_LEFT),
-			'company_id' => request()->company_id,
-			'status_id' => 1,
-			'salesperson_id' => request()->salesperson_id,
-			'customer_id' => request()->customer_id,
-			'completed_at' => now(),
-			'paid_at' => now()
-		]);
-
-		dd($invoice);
- */
-		//foreach ($invoice_cart as $invoice_row) {
-/* 			Invoice_Row::create([
-				''
-			]);
-			dump($invoice_row);
-			$table->increments('id');
-			$table->unsignedBigInteger('invoice_id');
-			$table->tinyText('description');
-			$table->unsignedFloat('price');
-			$table->unsignedTinyInteger('quantity');
-			$table->string('discount_string')->nullable();
-			$table->unsignedFloat('discount_value')->nullable();
-			$table->unsignedTinyInteger('refund_quantity')->nullable();
-			$table->boolean('deleted'); */
-			//$table->timestamps();
-		//}
     }
 
     /**
@@ -310,26 +204,25 @@ private function calculateDiscount($price, $quantity, $discountString) {
     }
 
     public function show_post(Request $request)
-    {
-		$invoice_number = request('invoice_number');
-
+	{
 		$ref = request()->headers->get('referer') ?? false;
 
-		if (!$ref || !request('password') || !$invoice_number) {
+		if (!$ref || !request('password') || !request('invoice_number')) {
 			return redirect()->route('invoices.index');
 		}
 
-		$db_user = Invoice::where('invoice_number', request('invoice_number'))->first()->user->makeVisible(['password']);
+		$db_user     = Invoice::where('invoice_number', request('invoice_number'))->first()->user->makeVisible(['password']);
 		$db_managers = User::where('is_manager', '=', true)->get()->makeVisible(['password']);
 
 		$cmp = $db_managers->concat([$db_user])->reduce(function ($hash, $item) {
   			return $hash || Hash::check(request('password'), $item->password);
 		});
 
-
 		if ($cmp) {
+			$invoice = Invoice::where('invoice_number', request('invoice_number'))->first();
 			return view('invoices.show', [
-				'invoice' => Invoice::where('invoice_number', request('invoice_number'))->first(),
+				'invoice' => $invoice,
+				'discount' => $invoice->discount(),
 				'headers' => request()->headers,
 				'request' => request('pass')
 			]);
@@ -364,8 +257,8 @@ private function calculateDiscount($price, $quantity, $discountString) {
 		//dd($t_Invoice->toArray());
 
 
-//$pdf = PDF::loadView('reports.today', ['Data' => $Data])->setOptions(['defaultFont' => 'sans-serif']);
-		
+		//$pdf = PDF::loadView('reports.today', ['Data' => $Data])->setOptions(['defaultFont' => 'sans-serif']);
+
 		//$pdf = PDF::setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true])->loadView('pdf', $data);
 		//return view('pdf', ['invoice' => $t_Invoice, 'company' => $t_Company]);
 		$pdf = PDF::loadView('pdf', $data);

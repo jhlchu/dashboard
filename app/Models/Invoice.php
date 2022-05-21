@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\FormatOutput\FormatOutput;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,6 +20,7 @@ class Invoice extends Model
 		'completed_at',
 		'paid_at'
     ];
+
 
 	public function status      () { return $this->belongsTo (Status     ::class, 'status_id'     ); }
 	public function company     () { return $this->belongsTo (Company    ::class, 'company_id'    ); }
@@ -53,36 +56,56 @@ class Invoice extends Model
 		return 'invoice_number';
 	}
 
-	private function discount($gross_total) {
-		$discountValue = (float)preg_match('/[0-9]+\.?[0-9]+/', $this->discount_string, $out) ? $out[0] : 0.00;
-		if (str_contains($this->discount_string, '%')) {
-			return $gross_total * (1 - $discountValue/100);
-		} else {
-			return $gross_total - $discountValue;
-		}
-	}
-
-	public function getGrossTotalAttribute() {
-		$total = 0;
-		foreach ($this->invoice_row as $row) {
-			$total += $row->total;
-		}
+	public function getGrossTotalAttribute()
+	{
+		$total = ($this->invoice_row)->reduce(
+			function ($temp, $item) {
+				return $temp + FormatOutput::moneyFormat($item->total);
+			},
+			0
+		);
 		return $total;
 	}
 
+	public function getTaxAttribute()
+	{
+		return $this->customer->tax;
+	}
+
 	public function getBeforeTaxAttribute() {
-		return $this->discount($this->_gross_total + ($this->shipping_handling ?? 0.00));
+		return $this->gross_total + $this->shipping_handling - $this->discount;
 	}
 
 	public function getTaxTotalAttribute() {
-		$tax = 0.00;
-		foreach ($this->customer->tax as $taxes) {
-			$tax += $taxes->value;
-		}
+		$tax = ($this->tax)->reduce(
+			function ($temp, $tax) {
+				return $temp + $tax->value;
+			},
+			0.00
+		);
 		return $tax;
 	}
 
 	public function getNetTotalAttribute() {
 		return $this->before_tax * (1 + $this->tax_total);
+	}
+
+	public function getDiscountAttribute()
+	{
+		return $this->discount;
+	}
+
+	protected function discount(): Attribute
+	{
+		return Attribute::make(
+			get: function ($discount_string, $attributes) {
+				$discount_value = (float) preg_match('/[0-9]+\.?[0-9]+/', $discount_string, $out) ? $out[0] : 0.00;
+				if (str_contains($discount_string, '%')) {
+					return FormatOutput::moneyFormat(($attributes['gross_total'] + $attributes['shipping_handling']) * $discount_value);
+				} else {
+					return FormatOutput::moneyFormat(($attributes['gross_total'] + $attributes['shipping_handling']) - $discount_value);
+				}
+			}
+		);
 	}
 }

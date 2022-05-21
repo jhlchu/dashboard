@@ -254,7 +254,7 @@
 			<div class="fixed bottom-0 left-0 right-0 py-3 bg-gray-200 shadow">
 			<div class="flex flex-row justify-center">
 				@foreach ($statuses as $status)
-					<button id="button_submit" class="text-white bg-{{ $status->color }}-700 hover:bg-{{ $status->color }}-800 focus:ring-4 focus:outline-none focus:bg-{{ $status->color }}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 w-[250px]" name="status" value="{{ $status->id }}" @click.prevent="">
+					<button id="button_submit" class="text-white bg-{{ $status->color }}-700 hover:bg-{{ $status->color }}-800 focus:ring-4 focus:outline-none focus:bg-{{ $status->color }}-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center mr-2 w-[250px]" name="status_id" value="{{ $status->id }}" @click.prevent="">
 						<span class="material-symbols-outlined">{{ $status->icon }}</span>{{ $status->name }}
 					</button>
 					{{-- @if (preg_match("(Draft|Completed|Paid)", $status->name) === 1) --}}{{-- @endif --}}

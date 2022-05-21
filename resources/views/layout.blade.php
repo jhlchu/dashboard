@@ -15,7 +15,7 @@
 		{{-- <script src="//unpkg.com/alpinejs" defer></script> --}}
 		{{-- <script src="https://cdn.tailwindcss.com"></script> --}}
 
-		<script data-cfasync="false" src="{{ asset('js/tailwindcss-3.0.24.min.js') }}"></script>
+		{{-- <script data-cfasync="false" src="{{ asset('js/tailwindcss-3.0.24.min.js') }}"></script> --}}
 		{{-- <script src="https://unpkg.com/flowbite@1.4.5/dist/flowbite.js"></script>	 --}}
 		{{-- <script data-cfasync="false" src="{{ asset('js/flowbite-1.4.5.min.js') }}"></script> --}}
 		{{-- <link rel="stylesheet" href="https://unpkg.com/flowbite@1.4.5/dist/flowbite.min.css" /> --}}
