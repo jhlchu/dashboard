@@ -26,7 +26,7 @@ class InvoiceRowFactory extends Factory
 			'price'       => $price,
 			'quantity'    => $quantity,
 			'discount'    => $discountString,
-			'refund'      => $hasRefund ? $this->faker->numberBetween($min = 1, $max = $quantity) : null,
+			'refund'      => $hasRefund ? $this->faker->numberBetween($min = 1, $max = $quantity) : 0,
 			'deleted'     => $this->faker->boolean($chanceOfGettingTrue = 5)
 		];
 	}
