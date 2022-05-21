@@ -109,4 +109,11 @@ class Invoice extends Model
 			}
 		);
 	}
+
+	protected function invoice_number(): Attribute
+	{
+		return Attribute::make(
+			get: fn ($value) => intval($value)
+		);
+	}
 }

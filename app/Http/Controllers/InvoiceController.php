@@ -145,7 +145,18 @@ class InvoiceController extends Controller
 		$invoice = new Invoice;
 
 		/* $invoice->customer->firstOrCreate([]); */
-		$invoice->invoice_number    = (Invoice::whereYear('created_at', date("Y"))->count() === 0) ? (date("y") . str_pad(1, 6, '0', STR_PAD_LEFT)) : (intval(Invoice::latest()->first()->value('invoice_number')) + 1);
+		$latest_invoice = Invoice::whereYear('created_at', date("Y"))->get();
+		$latest_invoice->fresh();
+		if (Invoice::whereYear('created_at', date("Y"))->count() === 0) {
+			$invoice->invoice_number = date("y") . str_pad(1, 6, '0', STR_PAD_LEFT);
+		} else {
+			$invoice->invoice_number = Invoice::latest()->first()->invoice_number + 1;
+			while (Invoice::where('invoice_number', $invoice->invoice_number)->exists()) {
+				$invoice->invoice_number = $invoice->invoice_number + 1;
+			}
+		}
+
+		/* $invoice->invoice_number    = (Invoice::whereYear('created_at', date("Y"))->count() === 0) ? (date("y") . str_pad(1, 6, '0', STR_PAD_LEFT)) : (Invoice::latest()->first()->invoice_number + 1); */
 		$invoice->customer_id       = $customer->id;
 		$invoice->company_id        = request('company_id');
 		$invoice->status_id         = request('status_id');
@@ -154,8 +165,6 @@ class InvoiceController extends Controller
 		$invoice->shipping_handling = request('shipping_handling');
 		$invoice->discount          = request('discount');
 
-		$invoice->completed_at = Status::find(request('status_id'))->name === 'Completed' && now();
-		$invoice->paid_at = Status::find(request('status_id'))->name === 'Paid' && now();
 		if (Status::find(request('status_id'))->name === 'Completed') {
 			$invoice->completed_at = now();
 		}
@@ -165,17 +174,15 @@ class InvoiceController extends Controller
 		}
 
 		$invoice->save();
-
 		foreach ($invoice_rows as $invoice_row) {
-			[$description, $price, $discount, $quantity] = $invoice_row;
-
 			$temp_row = new InvoiceRow;
 
+			
 			$temp_row->invoice_id  = $invoice->id;
-			$temp_row->description = $description;
-			$temp_row->price       = $price;
-			$temp_row->discount    = $discount;
-			$temp_row->quantity    = $quantity;
+			$temp_row->description = $invoice_row['description'];
+			$temp_row->price       = $invoice_row['price'];
+			$temp_row->discount    = $invoice_row['discount'] ?? '$0';
+			$temp_row->quantity    = $invoice_row['quantity'];
 			$temp_row->save();
 		}
 

@@ -12,6 +12,10 @@ class InvoiceRow extends Model
     use HasFactory;
 	public $timestamps = false;
 
+	protected $casts = [
+		'deleted' => 'boolean',
+	];
+
 	public function getDiscountStringAttribute()
 	{
 		return $this->discount;

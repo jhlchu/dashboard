@@ -20,7 +20,7 @@ class CreateInvoicesTable extends Migration
 			$table->unsignedTinyInteger('company_id');
 			$table->unsignedTinyInteger('salesperson_id');
 			$table->unsignedInteger('customer_id');
-			$table->text('notes')->nullable()->nullable();
+			$table->text('notes')->nullable();
 			$table->unsignedFloat('shipping_handling')->default(0.00);
 			$table->string('discount')->default('$0');
 			$table->timestamps();

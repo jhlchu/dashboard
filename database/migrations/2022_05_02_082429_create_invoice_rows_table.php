@@ -21,7 +21,7 @@ class CreateInvoiceRowsTable extends Migration
 			$table->unsignedTinyInteger('quantity');
 			$table->string('discount')->default('$0');
 			$table->unsignedTinyInteger('refund')->default(0);
-			$table->boolean('deleted');
+			$table->boolean('deleted')->default(false);
 		});
     }
 
