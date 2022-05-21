@@ -27,14 +27,7 @@ class CreateInvoicesTable extends Migration
 			$table->timestamp('completed_at')->nullable()->default(null);
 			$table->timestamp('paid_at')->nullable()->default(null);
         });
-    }
-	//Get Customer -> $customer_id
-		//Create Customer OR Get First
-	//Create Invoice
-	//Generate $invoice_number
-	//If Status
-
-
+	}
 
     /**
      * Reverse the migrations.

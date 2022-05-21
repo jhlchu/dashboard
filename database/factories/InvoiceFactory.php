@@ -26,7 +26,7 @@ class InvoiceFactory extends Factory
             'customer_id'       => \App\Models\Customer::inRandomOrder()->take(1)->value('id'),
             'notes'             => $hasNotes ? implode(', ', $this->faker->sentences($nb = 3, $asText = false)) : null,
             'shipping_handling' => $this->faker->randomFloat($nbMaxDecimals = 2, $min = 0, $max = 100),
-			'discount'   => $hasDiscount ? ($discountSign === '$' ? $discountSign . $discountStringValue : $discountStringValue . $discountSign) : null,
+			'discount'   => $hasDiscount ? ($discountSign === '$' ? $discountSign . $discountStringValue : $discountStringValue . $discountSign) : '$0',
             'completed_at'      => now(),
             'paid_at'           => now()
         ];
