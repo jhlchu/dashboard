@@ -9,6 +9,7 @@ module.exports = {
 		{ pattern: /bg-green-.+/ },
 		{ pattern: /bg-blue-.+/ },
 		{ pattern: /bg-purple-.+/ },
+		{ pattern: /bg-gray-.+/ },
 	],
 
 	content: [

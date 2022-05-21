@@ -18,5 +18,6 @@ jobs:
           cd ~/www/dashboard.element-acoustics.com/dashboard/
           git pull
           php artisan migrate:fresh --seed
+          php artisan optimize:clear
           
 #php artisan optimize:clear

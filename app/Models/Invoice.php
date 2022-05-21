@@ -73,6 +73,7 @@ class Invoice extends Model
 	}
 
 	public function getBeforeTaxAttribute() {
+		/* return $this->gross_total + $this->shipping_handling - FormatOutput::moneyFormat($this->discount); */
 		return $this->gross_total + $this->shipping_handling - $this->discount;
 	}
 
@@ -90,7 +91,7 @@ class Invoice extends Model
 		return $this->before_tax * (1 + $this->tax_total);
 	}
 
-	public function getDiscountAttribute()
+	public function getDiscountStringAttribute()
 	{
 		return $this->discount;
 	}
@@ -98,12 +99,12 @@ class Invoice extends Model
 	protected function discount(): Attribute
 	{
 		return Attribute::make(
-			get: function ($discount_string, $attributes) {
+			get: function ($discount_string) {
 				$discount_value = (float) preg_match('/[0-9]+\.?[0-9]+/', $discount_string, $out) ? $out[0] : 0.00;
 				if (str_contains($discount_string, '%')) {
-					return FormatOutput::moneyFormat(($attributes['gross_total'] + $attributes['shipping_handling']) * $discount_value);
+					return FormatOutput::moneyFormat(($this->gross_total + $this->shipping_handling) * $discount_value);
 				} else {
-					return FormatOutput::moneyFormat(($attributes['gross_total'] + $attributes['shipping_handling']) - $discount_value);
+					return FormatOutput::moneyFormat($discount_value);
 				}
 			}
 		);

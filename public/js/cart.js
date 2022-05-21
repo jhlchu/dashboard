@@ -81,7 +81,7 @@ document.addEventListener("alpine:init", () => {
 
 		async searchCustomers({target: {value : name}}) {
 			if (!name) {return }
-			const response = await fetch('/api/customer', {
+			const response = await fetch('/api/customers', {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',

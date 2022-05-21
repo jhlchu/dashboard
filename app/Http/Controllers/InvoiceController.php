@@ -65,7 +65,7 @@ class InvoiceController extends Controller
     public function store(Request $request)
     {
 
-		if (request('status') === 'cancel') {
+		if (!request('status_id')) {
 			return redirect()->route('invoices.index');
 		}
 
@@ -84,7 +84,7 @@ class InvoiceController extends Controller
 				'country'           => ['string', 'nullable'],
 				'tax_region'        => ['required', 'exists:tax_regions,id'],
 				'notes'             => ['string', 'nullable'],
-				'shipping_handling' => ['digit', 'nullable'],
+				'shipping_handling' => ['numeric', 'nullable'],
 				'discount'          => ['string', 'nullable']
 			/* 'invoice_cart.*.description'          => ['string', "required"], */
 		]);
@@ -128,7 +128,7 @@ class InvoiceController extends Controller
 				$customer->phone    = request('phone');
 				$customer->province = request('province');
 				$customer->country  = request('country');
-				$customer->store();
+				$customer->save();
 				break;
 			case 1:
 				$customer = $customers->first();
@@ -153,17 +153,18 @@ class InvoiceController extends Controller
 		$invoice->notes             = request('notes');
 		$invoice->shipping_handling = request('shipping_handling');
 		$invoice->discount          = request('discount');
-		$invoice->store();
 
-		$invoice->completed_at = Status::find(request('status'))->name === 'Completed' && now();
-		$invoice->paid_at = Status::find(request('status'))->name === 'Paid' && now();
-		if (Status::find(request('status'))->name === 'Completed') {
-			$invoice->completed_at = request('completed_at');
+		$invoice->completed_at = Status::find(request('status_id'))->name === 'Completed' && now();
+		$invoice->paid_at = Status::find(request('status_id'))->name === 'Paid' && now();
+		if (Status::find(request('status_id'))->name === 'Completed') {
+			$invoice->completed_at = now();
 		}
-		if (Status::find(request('status'))->name === 'Paid') {
+		if (Status::find(request('status_id'))->name === 'Paid') {
 			$invoice->completed_at = now();
 			$invoice->paid_at = now();
 		}
+
+		$invoice->save();
 
 		foreach ($invoice_rows as $invoice_row) {
 			[$description, $price, $discount, $quantity] = $invoice_row;
@@ -175,7 +176,7 @@ class InvoiceController extends Controller
 			$temp_row->price       = $price;
 			$temp_row->discount    = $discount;
 			$temp_row->quantity    = $quantity;
-			$temp_row->store();
+			$temp_row->save();
 		}
 
 		/* $invoice = Invoice::create([
@@ -220,9 +221,10 @@ class InvoiceController extends Controller
 
 		if ($cmp) {
 			$invoice = Invoice::where('invoice_number', request('invoice_number'))->first();
+			
 			return view('invoices.show', [
 				'invoice' => $invoice,
-				'discount' => $invoice->discount(),
+				/* 'discount' => $invoice->discount(), */
 				'headers' => request()->headers,
 				'request' => request('pass')
 			]);

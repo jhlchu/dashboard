@@ -12,25 +12,25 @@ class InvoiceRow extends Model
     use HasFactory;
 	public $timestamps = false;
 
-	public function getDiscountAttribute()
+	public function getDiscountStringAttribute()
 	{
 		return $this->discount;
 	}
 
 	public function getTotalAttribute()
 	{
-		return FormatOutput::moneyFormat(($this->price * $this->discount) * ($this->quantity - $this->refund));
+		return FormatOutput::moneyFormat(($this->price - $this->discount) * ($this->quantity - $this->refund));
 	}
 
 	protected function discount(): Attribute
 	{
 		return Attribute::make(
-			get: function ($discount_string, $attributes) {
+			get: function ($discount_string) {
 				$discount_value = (float)preg_match('/[0-9]+\.?[0-9]+/', $discount_string, $out) ? $out[0] : 0.00;
 				if (str_contains($discount_string, '%')) {
-					return FormatOutput::moneyFormat($attributes['price'] * $discount_value);
+					return FormatOutput::moneyFormat($this->price * $discount_value);
 				} else {
-					return FormatOutput::moneyFormat($attributes['price'] - $discount_value);
+					return FormatOutput::moneyFormat($discount_value);
 				}
 			}
 		);
