@@ -12,8 +12,8 @@
     {{-- <link type="text/css" rel="stylesheet" href="{{ public_path('/css/app.css') }}" /> --}}
     {{-- <link rel="stylesheet" href="{{ asset('css/pdf.css') }}" /> --}}
 
-    <title>{{ $invoice->invoice_number }} [{{ $invoice->salesperson_id }}]({{ date('d-M-Y') }}).pdf</title>
-    <style>
+    <title>{{ $invoice->invoice_number }} [{{ $invoice->user->name }}]({{ date('d-M-Y') }}).pdf</title>
+    <style  data-cfasync="false" >
         @font-face {
             font-family: 'Segoe-UI';
             src: url('{{ public_path('/fonts/segoeui.ttf') }}') format('truetype');
@@ -277,9 +277,6 @@
 
     </style>
 
-
-
-    </style>
 </head>
 
 <body>
@@ -295,7 +292,7 @@
                     </tr>
                     <tr>
                         <td>Sales</td>
-                        <td>{{ $salesperson }}</td>
+                        <td>{{ $invoice->user->name }}</td>
                     </tr>
 					<tr>
 						<td>Status</td>
