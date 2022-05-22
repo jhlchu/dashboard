@@ -1,3 +1,5 @@
+@php
+@endphp
 <!DOCTYPE html>
 <html lang="en">
 
@@ -285,16 +287,20 @@
         <div class='header-content'>
             <img src="https://www.element-acoustics.com/wp-content/uploads/2022/05/Element_BigE_Logo.png" />
             <div>
-                <p><span>INVOICE</span><span>22005483</span></p>
+                <p><span>INVOICE</span><span>{{ $invoice->invoice_number }}</span></p>
                 <table>
                     <tr>
                         <td>Date</td>
-                        <td>May 02, 2022</td>
+                        <td>{{ \Carbon\Carbon::parse($invoice->created_at)->format('M d, Y') }}</td>
                     </tr>
                     <tr>
                         <td>Sales</td>
-                        <td>ERIC</td>
+                        <td>{{ $salesperson }}</td>
                     </tr>
+					<tr>
+						<td>Status</td>
+						<td>{{ $invoice->status->name }}</td>
+					</tr>
                 </table>
             </div>
         </div>
@@ -322,8 +328,25 @@
         <div class="receipient">
             <table>
                 <tr>
-                    <td>FROM</td>
-                    <td>TO</td>
+                    <td style="">
+						<div>
+							<p style="font-size: 0.7rem;">BILL FROM</p>
+							<p>{{ $company->name }}</p>
+							<p>{{ $company->address1 }}</p>
+							<p>{{ $company->address2 ?? '' }}</p>
+							<p>{{ $company->city }},  {{ $company->province }}</p>
+							<p>{{ $company->country }},  {{ $company->postalcode }}</p>
+						</div>
+					</td>
+                    <td style="">
+						<div>
+							<p style="font-size: 0.7rem;">BILL TO</p>
+							<p>{{ $customer->name }}</p>
+							<p>{{ $customer->email.', ' ?? '' }} {{ $customer->phone  ?? ''}}</p>
+							<p>{{ $customer->address  ?? '' }}</p>
+							<p>{{ $customer->province.', '  ?? '' }} {{ $customer->country  ?? '' }}</p>
+						</div>
+					</td>
                 </tr>
             </table>
         </div>
@@ -339,65 +362,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>sdfjo jsdfio asdfji</td>
-                        <td>4.22</td>
-                        <td>10</td>
-                        <td>42.20</td>
-                    </tr>
-                    <tr>
-                        <td>sdfjo jsdfio asdfji</td>
-                        <td>4.22</td>
-                        <td>10</td>
-                        <td>42.20</td>
-                    </tr>
-                    <tr>
-                        <td>sdfjo jsdfio asdfji</td>
-                        <td>4.22</td>
-                        <td>10</td>
-                        <td>42.20</td>
-                    </tr>
-                    <tr>
-                        <td>sdfjo jsdfio asdfji</td>
-                        <td>4.22</td>
-                        <td>10</td>
-                        <td>42.20</td>
-                    </tr>
-                    <tr>
-                        <td>sdfjo jsdfio asdfji</td>
-                        <td>4.22</td>
-                        <td>10</td>
-                        <td>42.20</td>
-                    </tr>
-                    <tr>
-                        <td>sdfjo jsdfio asdfji</td>
-                        <td>4.22</td>
-                        <td>10</td>
-                        <td>42.20</td>
-                    </tr>
+				@foreach ($invoice_rows as $invoice_row)
+					<tr>
+						<td>{{ $invoice_row->description }}</td>
+						<td>{{ $invoice_row->price }}</td>
+						<td>{{ $invoice_row->discount }}</td>
+						<td>{{ $invoice_row->quantity }}</td>
+					</tr>
+				@endforeach
                     <tr class="cart-summary-row">
                         <td colspan='3' class="cart-summary-label">Gross Total</td>
-                        <td class="cart-summary-value">53.23</td>
+                        <td class="cart-summary-value">{{  $invoice->gross_total }}</td>
                     </tr>
                     <tr class="cart-summary-row">
                         <td colspan='3' class="cart-summary-label">Shipping & Handling</td>
-                        <td class="cart-summary-value">-</td>
+                        <td class="cart-summary-value">{{ $invoice->shipping_handling ?? '-' }}</td>
                     </tr>
                     <tr class="cart-summary-row">
                         <td colspan='3' class="cart-summary-label">Invoice Discount</td>
-                        <td class="cart-summary-value">12.33%</td>
+                        <td class="cart-summary-value">{{ $invoice->discount ?? '-' }}</td>
                     </tr>
-                    <tr class="cart-summary-row">
-                        <td colspan='3' class="cart-summary-label">PST (8.00%)</td>
-                        <td class="cart-summary-value">3.23</td>
-                    </tr>
-                    <tr class="cart-summary-row">
-                        <td colspan='3' class="cart-summary-label">GST (5.00%)</td>
-                        <td class="cart-summary-value">5.33</td>
-                    </tr>
+					@foreach ($taxes as $tax)
+						<tr class="cart-summary-row">
+							<td colspan='3' class="cart-summary-label">{{ $tax->name }} ({{ $tax->value*100 }}%)</td>
+							<td class="cart-summary-value">{{ $invoice->before_tax * $tax->value }}</td>
+						</tr>
+
+					@endforeach
                     <tr class="cart-summary-row">
                         <td colspan='3' class="cart-summary-label">NET TOTAL</td>
-                        <td class="cart-summary-value">70.22</td>
+                        <td class="cart-summary-value">{{ $invoice->net_total }}</td>
                     </tr>
 
                 </tbody>
@@ -407,7 +401,7 @@
         <div class="notes">
             <p class="notes-label">NOTES</p>
             <div class="notes-area">
-                dsjfoidfsj dfjgidsojg dfjgidsjgfosfig
+                {{ $invoice->notes }}
             </div>
         </div>
 

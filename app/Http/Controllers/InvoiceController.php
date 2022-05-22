@@ -151,7 +151,7 @@ class InvoiceController extends Controller
 		$latest_invoice = Invoice::whereYear('created_at', date("Y"))->get();
 		$latest_invoice->fresh();
 		if (Invoice::whereYear('created_at', date("Y"))->count() === 0) {
-			$invoice->invoice_number = date("y") . str_pad(1, 6, '0', STR_PAD_LEFT);
+			$invoice->invoice_number = date("y") . str_pad('1', 6, '0', STR_PAD_LEFT);
 		} else {
 			$invoice->invoice_number = Invoice::latest()->first()->invoice_number + 1;
 			while (Invoice::where('invoice_number', $invoice->invoice_number)->exists()) {
@@ -159,7 +159,6 @@ class InvoiceController extends Controller
 			}
 		}
 
-		/* $invoice->invoice_number    = (Invoice::whereYear('created_at', date("Y"))->count() === 0) ? (date("y") . str_pad(1, 6, '0', STR_PAD_LEFT)) : (Invoice::latest()->first()->invoice_number + 1); */
 		$invoice->customer_id       = $customer->id;
 		$invoice->company_id        = request('company_id');
 		$invoice->status_id         = request('status_id');
@@ -204,7 +203,9 @@ class InvoiceController extends Controller
      */
     public function show(Invoice $invoice)
     {
+	
 		$ref = request()->headers->get('referer') ?? false;
+		dump($ref);
 		if ($ref) {
 			return view('invoices.show', [
 				'invoice' => $invoice,
@@ -244,14 +245,14 @@ class InvoiceController extends Controller
 	public function pdf(Invoice $invoice) {
 		$t_Company = \App\Models\Company::factory()->make();
 		$t_Invoice = \App\Models\Invoice::factory()->has(\App\Models\Company::factory())->make();
-		$data['invoice'] = $t_Invoice;
-		$data['company'] = $t_Company;
+		//$data['invoice'] = $t_Invoice;
+		//$data['company'] = $t_Company;
 		$data['page'] = (object) [
 			'margin' => (object) ['left' => '50px', 'right'=> '50px', 'top' => '155px', 'bottom' => '120px'],
 			'offset' => (object) ['left' => '-50px', 'right'=> '-50px', 'top' => '-155px', 'bottom' => '-120px']
 		];
 		$data['disclaimer'] = (object) [
-			'line1' => 'Make cheque(s) payable to <span style="font-weight:700;">Element Acoustics Inc.</span> This bill is to
+			'line1' => 'Make cheque(s) payable to <span style="font-weight:700;">' . $invoice->company->business_name . '</span> This bill is to
 					be paid upon presentation. Unpaid bills may incur an interest charge of 1.5% per month. <span
 						style="font-weight:500;">All sales are final; no refunds. Deposit is non-refundable.</span> Returns
 					or exchanges are subject to our sales policy.',
@@ -259,15 +260,13 @@ class InvoiceController extends Controller
 					sales invoice.'
 		];
 
-
-		$customer = $invoice->customer;
-		$company = $invoice->company->address;
-		$taxes = $invoice->customer->tax;
-		$status = $invoice->status->name;
-		$invoice_rows = $invoice->invoice_rows;
-		//dd($o);
-		//dd($t_Invoice->toArray());
-
+		$data['invoice'] = $invoice;
+		$data['customer'] = $invoice->customer;
+		$data['company'] = $invoice->company;
+		$data['taxes'] = $invoice->customer->tax;
+		$data['status'] = $invoice->status->name;
+		$data['invoice_rows'] = $invoice->invoice_row;
+		$data['salesperson'] = $invoice->user->name;
 
 		//$pdf = PDF::loadView('reports.today', ['Data' => $Data])->setOptions(['defaultFont' => 'sans-serif']);
 
