@@ -202,8 +202,7 @@ class InvoiceController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show(Invoice $invoice)
-    {
-	
+	{
 		$ref = request()->headers->get('referer') ?? false;
 		dump($ref);
 		if ($ref) {
@@ -252,7 +251,7 @@ class InvoiceController extends Controller
 			'offset' => (object) ['left' => '-50px', 'right'=> '-50px', 'top' => '-155px', 'bottom' => '-120px']
 		];
 		$data['disclaimer'] = (object) [
-			'line1' => 'Make cheque(s) payable to <span style="font-weight:700;">' . $invoice->company->business_name . '</span> This bill is to
+			'line1' => 'Make cheque(s) payable to <span style="font-weight:700;">' . $invoice->company->business_name . '</span>. This bill is to
 					be paid upon presentation. Unpaid bills may incur an interest charge of 1.5% per month. <span
 						style="font-weight:500;">All sales are final; no refunds. Deposit is non-refundable.</span> Returns
 					or exchanges are subject to our sales policy.',
@@ -266,7 +265,6 @@ class InvoiceController extends Controller
 		$data['taxes'] = $invoice->customer->tax;
 		$data['status'] = $invoice->status->name;
 		$data['invoice_rows'] = $invoice->invoice_row;
-		$data['salesperson'] = $invoice->user->name;
 
 		//$pdf = PDF::loadView('reports.today', ['Data' => $Data])->setOptions(['defaultFont' => 'sans-serif']);
 

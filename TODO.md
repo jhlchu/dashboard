@@ -3,6 +3,7 @@
 - [ ] Create Invoice > Autofill other customer fields
 - [ ] PDF on prod. changes
 - [ ] Migration with drop
+- [ ] Create Invoice to redirect with notification
 
 
 # Refresh

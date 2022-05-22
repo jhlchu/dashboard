@@ -117,7 +117,7 @@
             font-size: 0.7rem;
         }
 
-        .cart table tbody tr:nth-child(2n) {
+        .cart .items tbody tr:nth-child(2n) {
             background-color: lightgray;
         }
 
@@ -316,8 +316,6 @@
                     <td style="text-align:left; width: 30%">(548) 234-2738</td>
                 </tr>
             </table>
-
-
         </div>
     </footer>
 
@@ -349,7 +347,7 @@
         </div>
 
         <div class="cart" style="">
-            <table>
+            <table class="items">
                 <thead>
                     <tr>
                         <th style="text-align: left;">Description</th>
@@ -359,36 +357,65 @@
                     </tr>
                 </thead>
                 <tbody>
-				@foreach ($invoice_rows as $invoice_row)
+				@foreach ($invoice->invoice_row as $invoice_row)
 					<tr>
-						<td>{{ $invoice_row->description }}</td>
-						<td>{{ $invoice_row->price }}</td>
-						<td>{{ $invoice_row->discount }}</td>
-						<td>{{ $invoice_row->quantity }}</td>
+						<td><p>{{ $invoice_row->description }}</p>
+							@if ($invoice_row->discount && $invoice_row->discount !== '$0')
+								<p style="font-size: 0.7rem;">Discount</p>
+							@endif
+							@if ($invoice_row->refund)
+								<p style="font-size: 0.7rem;">Refund</p>
+							@endif
+						</td>
+						<td><p>{{ $invoice_row->price }}</p>
+							@if ($invoice_row->discount && $invoice_row->discount !== '$0')
+								<p style="font-size: 0.7rem;">{{ $invoice_row->discount }}</p>
+							@endif
+						</td>
+						<td><p>{{ $invoice_row->quantity }}</p>
+							@if ($invoice_row->refund)
+								<p style="font-size: 0.7rem;">{{ $invoice_row->refund }}</p>
+							@endif
+						</td>
+						<td><p>{{ $invoice_row->total }}</p>
+							@if ($invoice_row->discount && $invoice_row->discount !== '$0')
+								<p style="font-size: 0.7rem;">- {{ $invoice_row->discount_value }}</p>
+							@endif
+							@if ($invoice_row->refund)
+								<p style="font-size: 0.7rem;">- {{ $invoice_row->price * $invoice_row->refund }}</p>
+							@endif
+						</td>
 					</tr>
 				@endforeach
+				</tbody>
+				</table>
+				<table>
+					<tbody>
+				
+
                     <tr class="cart-summary-row">
                         <td colspan='3' class="cart-summary-label">Gross Total</td>
-                        <td class="cart-summary-value">{{  $invoice->gross_total }}</td>
+                        <td class="cart-summary-value">{{  \FormatOutput::dollarFormat($invoice->gross_total) }}</td>
                     </tr>
                     <tr class="cart-summary-row">
                         <td colspan='3' class="cart-summary-label">Shipping & Handling</td>
-                        <td class="cart-summary-value">{{ $invoice->shipping_handling ?? '-' }}</td>
+                        <td class="cart-summary-value">{{ \FormatOutput::moneyFormat($invoice->shipping_handling) ?? '-' }}</td>
                     </tr>
-                    <tr class="cart-summary-row">
+					@if ($invoice->discount !== '$0' || null)
+						<tr class="cart-summary-row">
                         <td colspan='3' class="cart-summary-label">Invoice Discount</td>
-                        <td class="cart-summary-value">{{ $invoice->discount ?? '-' }}</td>
+                        <td class="cart-summary-value">{{ $invoice->discount }}</td>
+					@endif
                     </tr>
 					@foreach ($taxes as $tax)
 						<tr class="cart-summary-row">
 							<td colspan='3' class="cart-summary-label">{{ $tax->name }} ({{ $tax->value*100 }}%)</td>
-							<td class="cart-summary-value">{{ $invoice->before_tax * $tax->value }}</td>
+							<td class="cart-summary-value">{{ \FormatOutput::moneyFormat($invoice->before_tax * $tax->value) }}</td>
 						</tr>
-
 					@endforeach
                     <tr class="cart-summary-row">
                         <td colspan='3' class="cart-summary-label">NET TOTAL</td>
-                        <td class="cart-summary-value">{{ $invoice->net_total }}</td>
+                        <td class="cart-summary-value">{{ \FormatOutput::dollarFormat($invoice->net_total) }}</td>
                     </tr>
 
                 </tbody>

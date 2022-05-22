@@ -1,11 +1,11 @@
-const bcrypt = dcodeIO.bcrypt;
-const username_field = document.querySelector('#form_modal_name');
-const user_id_field = document.querySelector('#form_user_id');
-const password_field = document.querySelector('#form_password');
+const bcrypt               = dcodeIO.bcrypt;
+const username_field       = document.querySelector('#form_modal_name');
+const user_id_field        = document.querySelector('#form_user_id');
+const password_field       = document.querySelector('#form_password');
 const invoice_number_field = document.querySelector('#form_invoice_number');
-const form_body = document.querySelector('#form_body');
-const form_error = document.querySelector('#form_error');
-const submit_button = document.querySelector('#hash_submit');
+const form_body            = document.querySelector('#form_body');
+const form_error           = document.querySelector('#form_error');
+const submit_button        = document.querySelector('#hash_submit');
 
 const open_form_modal = (id, username, route, invoice_number) => {
 
@@ -18,7 +18,7 @@ const open_form_modal = (id, username, route, invoice_number) => {
 	//Passing parameters
 	password_field.focus();
 	username_field.textContent = username;
-	user_id_field.value = id;
+	user_id_field.value        = id;
 	invoice_number_field.value = invoice_number;
 	form_body.action           = route;
 }
@@ -27,7 +27,7 @@ const verify_hash = () => {
 	form_error.style.display = 'none';
 
 	const form_user = hashes.filter(({id}) => id === parseInt(user_id_field.value)).pop();
-	const managers = hashes.filter(({ is_manager }) => is_manager == true);
+	const managers  = hashes.filter(({ is_manager }) => is_manager == true);
 
 	//User not found
 	if (!form_user) {
