@@ -27,9 +27,10 @@ class InvoiceController extends Controller
     public function index()
     {
         return view('invoices.index', [
-			'invoices'    => Invoice::latest()
+			/* 'invoices'    => Invoice::latest()
 				->filter(request(['query', 'salesperson_id', 'company_id', 'customer_id', 'status_id']))
-				->get(),
+				->get(), */
+			'invoices'    => Invoice::latest()->filter()->get(),
 			'salespeople' => User::get(['id', 'name']),
 			'customers'   => Customer::get(['id', 'name', 'email', 'address', 'phone', 'tax_region']),
 			'companies'   => Company::get(['id', 'name']),
@@ -114,11 +115,11 @@ class InvoiceController extends Controller
 			$query->where('name', request('name'))
 			->where('tax_region', request('tax_region'));
 		})->where(function ($query) {
-			$query->when(request('address'), fn ($query) => $query->where('address', request('address')))
-				->when(request('email'), fn ($query) => $query->where('email', request('email')))
-				->when(request('phone'), fn ($query) => $query->where('phone', request('phone')))
-				->when(request('province'), fn ($query) => $query->where('province', request('province')))
-				->when(request('country'), fn ($query) => $query->where('country', request('country')));	
+			$query->whenRequest('address')
+				->whenRequest('email')
+				->whenRequest('phone')
+				->whenRequest('province')
+				->whenRequest('country');
 		})->get();
 
 		$customer = new Customer;
@@ -222,7 +223,7 @@ class InvoiceController extends Controller
 			return redirect()->route('invoices.index');
 		}
 
-		$db_user     = Invoice::where('invoice_number', request('invoice_number'))->first()->user->makeVisible(['password']);
+		$db_user     = Invoice::firstWhere('invoice_number', request('invoice_number'))->user->makeVisible(['password']);
 		$db_managers = User::where('is_manager', '=', true)->get()->makeVisible(['password']);
 
 		$cmp = $db_managers->concat([$db_user])->reduce(function ($hash, $item) {
@@ -230,7 +231,7 @@ class InvoiceController extends Controller
 		});
 
 		if ($cmp) {
-			$invoice = Invoice::where('invoice_number', request('invoice_number'))->first();
+			$invoice = Invoice::firstWhere('invoice_number', request('invoice_number'));
 			
 			return view('invoices.show', [
 				'invoice' => $invoice,

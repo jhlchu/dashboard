@@ -28,26 +28,19 @@
 			@csrf
 
 			<h2 class="border-b-2 border-gray-700 text-lg p-3 font-medium my-3 ">Company Information</h2>
-			<div class="flex flex-row m-3 mb-5">
+			<div class="flex md:flex-row m-3 mb-5 flex-col">
 				<x-forms.select name="company_id" label="Company" :data="$companies" icon="apartment" oldIndex=old_company />
-				<x-forms.select name="salesperson_id" label="Salesperson" :data="$salespeople" icon="group" oldIndex=old_user class="w-[200px]" />
+				<x-forms.select name="salesperson_id" label="Salesperson" :data="$salespeople" icon="group" oldIndex=old_user class="md:w-[200px] md:mt-0 mt-3" />
 			</div>
 
 			<h2 class="border-b-2 border-gray-700 text-lg p-3 font-medium">Customer Information</h2>
 			<div class="flex flex-col mb-2" x-data="invoice">
-				<div class="flex flex-row m-3">
-					<div class="relative w-fit mx-3 flex-grow">
+				<div class="flex md:flex-row m-3 flex-col">
+					<div class="relative md:w-fit md:mx-3 flex-grow">
 						<label for="customer" class="block mb-2 text-sm font-medium text-gray-900">Name</label>
 						<div class="flex">
-							<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md material-symbols-outlined">
-								person
-								<svg role="status" id="spinner_customer" class="hidden text-right inline w-4 h-4 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-								<path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-								<path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-							</svg>
-							</span>
+							<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md material-symbols-outlined">person</span>
 							<input type="search" name="name" id="customer" x-bind:value="current_customer.name" @input.debounce="searchCustomers" @blur.debounce="unselect" @focus.debounce="searchCustomers" class="rounded-none rounded-r-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5" required="required" autocomplete="nop" />
-							
 						</div>
 						@error('name')
 							{{ $message }}
@@ -76,14 +69,14 @@
 					<x-forms.input-bind name="email" label="Email" type="search" model="current_customer" icon="alternate_email" />
 					<x-forms.input-bind name="phone" label="Phone" type="search" model="current_customer" icon="android_dialer" />
 				</div>
-				<div class="m-3">
+				<div class="md:m-3">
 					<x-forms.input-bind name="address" label="Address" type="search" model="current_customer" icon="home" />
 				</div>
-				<div class="flex flex-row m-3">
+				<div class="flex flex-col md:flex-row md:m-3">
 					<x-forms.input-bind name="province" label="Province" type="search" model="current_customer" icon="map" class="flex-grow" />
 					<x-forms.input-bind name="country" label="Country" type="search" model="current_customer" icon="public" class="flex-grow" />
-					
-					<div class='mx-3 w-[200px]'>
+
+					<div class='mx-3 md:w-[200px]'>
 						<label for="tax_region" class="block mb-2 text-sm font-medium text-gray-900">Tax Region</label>
 						<div class="flex">
 							<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md material-symbols-outlined">
@@ -112,11 +105,11 @@
 				@error('invoice_cart', 'cart')
 					{{ $message }}
 				@enderror
-				<table class="md:table-fixed w-full">
+				<table class="md:table-fixed w-full flex flex-col">
 					<thead class="md:table-row-group md:mb-6">
-						<tr x-on:keydown.prevent.enter="" class="md:table-row">
-							<td class="md:w-[30px]">{{-- <button @click.prevent="addCartRow" >+</button> --}}</td>
-							<td>
+						<tr x-on:keydown.prevent.enter="" class="md:table-row flex flex-col">
+							<td class="hidden md:table-cell md:w-[30px]">{{-- <button @click.prevent="addCartRow" >+</button> --}}</td>
+							<td class="md:my-0 my-2">
 								<div class='mx-1'>
 									<div class="flex">
 										<input type="text" placeholder="Description" class="rounded-lg bg-gray-50 border border-gray-300 text-gray-900 focus:ring-blue-500 focus:border-blue-500 block flex-1 min-w-0 w-full text-sm p-2.5 text-left" x-model="new_cart_row.description" @keyup.enter="addCartRow" id="input_description"/>
@@ -126,7 +119,7 @@
 									@enderror
 								</div>
 							</td>
-							<td class="md:table-cell md:w-2/12">
+							<td class="md:table-cell md:w-2/12 md:my-0 my-2">
 								<div class='mx-1'>
 									<div class="flex">
 										<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md material-symbols-outlined">
@@ -139,7 +132,7 @@
 									@enderror
 								</div>
 							</td>
-							<td class="md:table-cell md:w-2/12">
+							<td class="md:table-cell md:w-2/12 md:my-0 my-2">
 								<div class='mx-1'>
 									<div class="flex">
 										<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md">
@@ -149,7 +142,7 @@
 									</div>
 								</div>
 							</td>
-							<td class="md:table-cell md:w-[140px] ">
+							<td class="md:table-cell md:w-[140px] md:my-0 my-2">
 								<div class='mx-1'>
 									<div class="flex">
 										<span class="inline-flex items-center px-3 text-sm text-gray-900 bg-gray-200 border border-r-0 border-gray-300 rounded-l-md material-symbols-outlined">
@@ -162,7 +155,7 @@
 									@enderror
 								</div>
 							</td>
-							<td class="md:w-[150px]">
+							<td class="md:w-[150px] md:my-0 my-2">
 								<p x-text="twoDigitString(calculateTotal(new_cart_row.price, new_cart_row.discount, new_cart_row.quantity))" class="before:content-['$'] my-2 mx-1 p-1 text-right text-lg"></p>
 							</td>
 							
@@ -189,14 +182,14 @@
 						</template>
 					</tbody>
 				</table>
-				<div class="flex flex-row justify-end">
-					<table class="md:table w-1/2 mt-5">
+				<div class="md:flex md:flex-row md:justify-end">
+					<table class="md:table md:w-1/2 mt-5">
 						<tbody class="md:table-row-group">
 							<tr class="border-b-2 border-gray-700">
 									<td class='py-3'><p class="text-right">Gross Total</p></td>
 									<td class='py-3'><p class="text-right" x-text="money(grossTotal())"></p></td>
 								</tr>
-								<tr x-on:keydown.prevent.enter="">
+								<tr x-on:keydown.prevent.enter="" class="md:table-row flex flex-col">
 									<td class='py-3'><p class="text-right" ><span class="material-symbols-outlined mr-2">local_shipping</span>Shipping & Handling</p></td>
 									<td class='py-3'>
 										<div class='ml-3'>

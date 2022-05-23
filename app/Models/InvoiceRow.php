@@ -22,6 +22,18 @@ class InvoiceRow extends Model
 		return $this->discount;
 	} */
 
+	public function getRefundStringAttribute()
+	{
+		return ($this->refund === 0 || null) ? '-' : $this->refund;
+	}
+
+
+	public function getDiscountStringAttribute()
+	{
+		return ($this->discount === '$0' || null) ? '-' : $this->discount;
+	}
+
+	
 	public function getDiscountValueAttribute()
 	{
 		$discount_value = preg_match('/[0-9]+\.?[0-9]*/', $this->discount, $out) ? floatVal($out[0]) : 0.00;
@@ -37,17 +49,25 @@ class InvoiceRow extends Model
 		return ($this->price - $this->discount_value) * ($this->quantity - $this->refund);
 	}
 
-	/* protected function discount(): Attribute
+	protected function discount(): Attribute
 	{
 		return Attribute::make(
-			get: function ($discount_string) {
+			set: function ($discount_string) {
+				if (!preg_match('/(\$|%)/', $discount_string)) {
+					preg_match('/[0-9]+\.?[0-9]*/', $discount_string, $out);
+					return '$' . (float) $out[0];
+				} else {
+					return $discount_string;
+				}
+			}
+			/* get: function ($discount_string) {
 				$discount_value = (float)preg_match('/[0-9]+\.?[0-9]+/', $discount_string, $out) ? $out[0] : 0.00;
 				if (str_contains($discount_string, '%')) {
 					return FormatOutput::moneyFormat($this->price * $discount_value);
 				} else {
 					return FormatOutput::moneyFormat($discount_value);
 				}
-			}
+			} */
 		);
-	} */
+	}
 }
