@@ -290,10 +290,12 @@
                         <td>Sales</td>
                         <td>{{ $invoice->user->name }}</td>
                     </tr>
-					<tr>
-						<td>Status</td>
-						<td>{{ $invoice->status->name }}</td>
-					</tr>
+					@if ($invoice->status->name === 'Paid' || 'Deleted' || 'Draft')
+						<tr>
+							<td>Status</td>
+							<td>{{ $invoice->status->name }}</td>
+						</tr>
+					@endif
                 </table>
             </div>
         </div>

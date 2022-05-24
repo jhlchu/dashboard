@@ -174,8 +174,9 @@ class InvoiceController extends Controller
 			$invoice->completed_at = now();
 			$invoice->paid_at = now();
 		}
-		dd($invoice);
-		//$invoice->save();
+		//dd($invoice);
+		$invoice->save();
+		$invoice->refresh();
 
 		foreach ($invoice_rows as $invoice_row) {
 			$temp_row = new InvoiceRow;
@@ -189,11 +190,12 @@ class InvoiceController extends Controller
 		}
 
 		return redirect()
-		->route('invoices.show', ['invoice' => $invoice->invoice_number])
-		->withHeaders([
+			->route('invoices.show', ['invoice' => $invoice->invoice_number])
+			/* ->withHeaders([
 			'password' => User::firstWhere('id', request('salesperson_id'))->password,
-			'invoice_number' => $invoice->invoice_number
-		])->with('message', 'Invoice Created.');
+			'invoice_number' => $invoice->invoice_number ])*/
+			->with('created_redirect', true)
+			->with('message', 'Invoice Created.');
 
 		/* $invoice = Invoice::create([
 			request()->validated()
@@ -207,16 +209,33 @@ class InvoiceController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(Invoice $invoice)
+	public function show(Invoice $invoice)
 	{
-		dd($invoice);
 		$ref = request()->headers->get('referer') ?? false;
-
-		if (!$ref || !request('password') || !request('invoice_number')) {
+		if ((!$ref || !request('password')) && (session('created_redirect') === null)) {
 			return redirect()->route('invoices.index')->withMessage(['fail' => 'Not authorized.']);
 		}
 
-		$db_user     = Invoice::firstWhere('invoice_number', request('invoice_number'))->user->makeVisible(['password']);
+		$password_hash = User::where('is_manager', '=', true)->get()->makeVisible(['password'])
+		->concat([$invoice->user->makeVisible(['password'])])
+		->reduce(function ($hash, $item) {
+			return $hash || Hash::check(request('password'), $item->password);
+		});
+
+		if ($password_hash || session('created_redirect')) {
+			return view('invoices.show', ['invoice' => $invoice]);
+		} else {
+			return redirect()->route('invoices.index');
+		}
+	}
+/*     public function show(Invoice $invoice)
+	{
+		$ref = request()->headers->get('referer') ?? false;
+		if (!$ref || !$invoice || !request('password')) {
+			return redirect()->route('invoices.index')->withMessage(['fail' => 'Not authorized.']);
+		}
+
+		$db_user     = $invoice->user->makeVisible(['password']);
 		$db_managers = User::where('is_manager', '=', true)->get()->makeVisible(['password']);
 
 		$cmp = $db_managers->concat([$db_user])->reduce(function ($hash, $item) {
@@ -224,27 +243,11 @@ class InvoiceController extends Controller
 		});
 
 		if ($cmp) {
-			$invoice = Invoice::firstWhere('invoice_number', request('invoice_number'));
-
-			return view('invoices.show', [
-				'invoice' => $invoice,
-				/* 'discount' => $invoice->discount(), */
-				'headers' => request()->headers,
-				'request' => request('pass')
-			]);
+			return view('invoices.show', ['invoice' => $invoice]);
 		} else {
 			return redirect()->route('invoices.index');
 		}
-		/* $ref = request()->headers->get('referer') ?? false;
-		dump($ref);
-		if ($ref) {
-			return view('invoices.show', [
-				'invoice' => $invoice,
-				'headers' => request()->headers,
-				'request' => request('pass')
-			]);
-		} else { return redirect()->route('invoices.index'); } */
-    }
+    } */
 
     public function show_post(Request $request)
 	{
@@ -266,7 +269,6 @@ class InvoiceController extends Controller
 
 			return view('invoices.show', [
 				'invoice' => $invoice,
-				/* 'discount' => $invoice->discount(), */
 				'headers' => request()->headers,
 				'request' => request('pass')
 			]);

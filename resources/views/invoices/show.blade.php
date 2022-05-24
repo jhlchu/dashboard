@@ -135,31 +135,31 @@
 	<div class="flex flex-row justify-end">
 		<table class="grid grid-cols-2 text-left text-sm md:table md:table-fixed md:w-1/2 xl:w-5/12">
 			<tbody class="contents md:table-row-group">
-				<tr class="contents border-b-2 md:table-row hover:bg-gray-200">
-					<th scope="row" class="col-span-2 mx-5 text-lg font-medium text-right w-1/2">Gross Total</th>
-					<td class="col-span-2 text-right text-xl md:table-cell px-4"><span class="float-left mr-5 px-5 text-right">$</span>{{ FormatOutput::moneyFormat($invoice->gross_total) }}</td>
+				<tr class="contents border-b-2 md:table-row hover:bg-gray-200 ">
+					<th scope="row" class="col-start-1 col-end-2 col-span-2 mx-5 text-lg font-medium text-right md:w-1/2">Gross Total</th>
+					<td class="col-start-2 col-end-3 col-span-2 text-right text-xl md:table-cell px-4"><span class="float-left mr-5 px-5 text-right">$</span>{{ FormatOutput::moneyFormat($invoice->gross_total) }}</td>
 				</tr>
-				<tr class="contents md:table-row hover:bg-gray-200">
-					<th scope="row" class="col-span-2 mx-5 text-lg font-medium text-right w-1/2">Shipping &amp; Handling</th>
-					<td class="col-span-2 text-right text-xl md:table-cell px-4">{{ FormatOutput::moneyFormat($invoice->shipping_handling) ?? 0.00 }}</td>
+				<tr class="contents md:table-row hover:bg-gray-200 ">
+					<th scope="row" class="col-start-1 col-end-2 col-span-2 mx-5 text-lg font-medium text-right md:w-1/2">Shipping &amp; Handling</th>
+					<td class="col-start-2 col-end-3 col-span-2 text-right text-xl md:table-cell px-4">{{ FormatOutput::moneyFormat($invoice->shipping_handling) ?? 0.00 }}</td>
 				</tr>
-				<tr class="contents md:table-row hover:bg-gray-200">
-					<th scope="row" class="col-span-2 mx-5 text-lg font-medium text-right w-1/2">Invoice Discount</th>
-					<td class="col-span-2 text-right text-xl md:table-cell px-4">{{ $invoice->discount_string }}</td>
+				<tr class="contents md:table-row hover:bg-gray-200 ">
+					<th scope="row" class="col-start-1 col-end-2 col-span-2 mx-5 text-lg font-medium text-right md:w-1/2">Invoice Discount</th>
+					<td class="col-start-2 col-end-3 col-span-2 text-right text-xl md:table-cell px-4">{{ $invoice->discount_string }}</td>
 				</tr>
-				<tr class="contents border-b-2 md:table-row hover:bg-gray-200">
-					<th scope="row" class="col-span-2 mx-5 text-lg font-medium text-right w-1/2">Before Tax</th>
-					<td class="col-span-2 text-right text-xl md:table-cell px-4"><span class="float-left mr-5 px-5 text-right">$</span>{{ FormatOutput::moneyFormat($invoice->before_tax) }}</td>
+				<tr class="contents border-b-2 md:table-row hover:bg-gray-200 ">
+					<th scope="row" class="col-start-1 col-end-2 col-span-2 mx-5 text-lg font-medium text-right md:w-1/2">Before Tax</th>
+					<td class="col-start-2 col-end-3 col-span-2 text-right text-xl md:table-cell px-4"><span class="float-left mr-5 px-5 text-right">$</span>{{ FormatOutput::moneyFormat($invoice->before_tax) }}</td>
 				</tr>
 				@foreach ($invoice->customer->tax as $tax)
-				<tr class="contents md:table-row hover:bg-gray-200">
-					<th scope="row" class="col-span-2 mx-5 text-lg font-medium text-right w-1/2">{{ $tax->name }} ({{ $tax->value * 100 }}%)</th>
-					<td class="col-span-2 text-right text-xl md:table-cell px-4">{{ FormatOutput::moneyFormat($invoice->before_tax * $tax->value) }}</td>
+				<tr class="contents md:table-row hover:bg-gray-200 ">
+					<th scope="row" class="col-start-1 col-end-2 col-span-2 mx-5 text-lg font-medium text-right md:w-1/2">{{ $tax->name }} ({{ $tax->value * 100 }}%)</th>
+					<td class="col-start-2 col-end-3 col-span-2 text-right text-xl md:table-cell px-4">{{ FormatOutput::moneyFormat($invoice->before_tax * $tax->value) }}</td>
 				</tr>
 				@endforeach
-				<tr class="contents border-double border-y-2 border-gray-700 md:table-row hover:bg-gray-200 text-2xl font-semibold">
-					<th scope="row" class="col-span-2 mx-5 text-right w-1/2 uppercase ">Net Total</th>
-					<td class="col-span-2 text-right md:table-cell px-4"><span class="float-left mr-5 px-5 text-right">$</span>{{ FormatOutput::moneyFormat($invoice->net_total) }}</td>
+				<tr class="contents border-double border-y-2 border-gray-700 md:table-row hover:bg-gray-200  text-2xl font-semibold">
+					<th scope="row" class="col-start-1 col-end-2 col-span-2 mx-5 text-right md:w-1/2 uppercase ">Net Total</th>
+					<td class="col-start-2 col-end-3 col-span-2 text-right md:table-cell px-4"><span class="float-left mr-5 px-5 text-right">$</span>{{ FormatOutput::moneyFormat($invoice->net_total) }}</td>
 				</tr>
 			<tbody>
 		</table>

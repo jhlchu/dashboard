@@ -1,6 +1,6 @@
 # To Do
 - [ ] Save notes with line breaks
-- [ ] Complete without Paid date
+- [x] Complete without Paid date
 - [ ] Create Invoice > Autofill other customer fields
 - [ ] PDF on prod. changes
 - [ ] Migration with drop
@@ -8,6 +8,8 @@
 - [ ] Pagination
 - [ ] with and withWhere query
 - [ ] Unicode fonts
+- [ ] Create buttons disable on submit
+- [ ] customerWhen check reject on bc + bc & phone
 
 
 # Refresh
