@@ -122,7 +122,9 @@
         }
 
         .cart table tbody tr td {
-            padding: 0.2rem;
+            
+			margin: 0;
+			padding: 0;
             font-size: 1rem;
 
         }
@@ -278,7 +280,7 @@
 <body>
     <header>
         <div class='header-content'>
-            <img src="https://www.element-acoustics.com/wp-content/uploads/2022/05/Element_BigE_Logo.png" />
+            <img src="https://www.element-acoustics.com/wp-content/uploads/2022/05/Element_BigE_Logo.png" style="margin-top: 0.5rem;" />
             <div>
                 <p><span>INVOICE</span><span>{{ $invoice->invoice_number }}</span></p>
                 <table>
@@ -317,34 +319,35 @@
         </div>
     </footer>
 
-    <main>
+    <main style="padding-top: 0.2rem">
         <div class="receipient">
             <table>
                 <tr>
                     <td style="">
 						<div>
 							<p style="font-size: 0.7rem;">BILL FROM</p>
-							<p>{{ $company->name }}</p>
-							<p>{{ $company->address1 }}</p>
-							<p>{{ $company->address2 ?? '' }}</p>
-							<p>{{ $company->city }},  {{ $company->province }}</p>
-							<p>{{ $company->country }},  {{ $company->postalcode }}</p>
+							<p style="margin: 0rem 0">{{ $company->name }}</p>
+							<p style="margin: 0rem 0">{{ $company->address1 }}</p>
+							<p style="margin: 0rem 0">{{ $company->address2 ?? '' }}</p>
+							<p style="margin: 0rem 0">{{ $company->city }},  {{ $company->province }}</p>
+							<p style="margin: 0rem 0">{{ $company->country }},  {{ $company->postalcode }}</p>
 						</div>
 					</td>
                     <td style="">
 						<div>
 							<p style="font-size: 0.7rem;">BILL TO</p>
-							<p>{{ $customer->name }}</p>
-							<p>{{ $customer->email.', ' ?? '' }} {{ $customer->phone  ?? ''}}</p>
-							<p>{{ $customer->address  ?? '' }}</p>
-							<p>{{ $customer->province.', '  ?? '' }} {{ $customer->country  ?? '' }}</p>
+							<p style="margin: 0rem 0">{{ $customer->name }}</p>
+							<p style="margin: 0rem 0">{{ $customer->email.', ' ?? '' }} {{ $customer->phone  ?? ''}}</p>
+							<p style="margin: 0rem 0">{{ $customer->address  ?? '' }}</p>
+							<p style="margin: 0rem 0">{{ $customer->province.', '  ?? '' }} {{ $customer->country  ?? '' }}</p>
+							<p></p>
 						</div>
 					</td>
                 </tr>
             </table>
         </div>
 
-        <div class="cart" style="">
+        <div class="cart" style="margin-top: 1rem; border-top: 0.25rem solid gray">
             <table class="items">
                 <thead>
                     <tr>
@@ -357,31 +360,25 @@
                 <tbody>
 				@foreach ($invoice->invoice_row as $invoice_row)
 					<tr>
-						<td><p>{{ $invoice_row->description }}</p>
+						<td style="vertical-align: top;"><p style="margin:0; padding:0;">{{ $invoice_row->description }}</p>
 							@if ($invoice_row->discount && $invoice_row->discount !== '$0')
-								<p style="font-size: 0.7rem;">Discount</p>
+								<p style="font-size: 0.7rem; margin: 0; padding: 0;">Discount ({{ $invoice_row->discount }})</p>
 							@endif
 							@if ($invoice_row->refund)
 								<p style="font-size: 0.7rem;">Refund</p>
 							@endif
 						</td>
-						<td><p>{{ $invoice_row->price }}</p>
+						<td style="vertical-align: top;"><p style="margin:0; padding:0;">{{ $invoice_row->price }}</p>
 							@if ($invoice_row->discount && $invoice_row->discount !== '$0')
-								<p style="font-size: 0.7rem;">{{ $invoice_row->discount }}</p>
+								<p style="font-size: 0.7rem; margin: 0; padding: 0;">-{{ $invoice_row->discount_value }}</p>
 							@endif
 						</td>
-						<td><p>{{ $invoice_row->quantity }}</p>
+						<td style="vertical-align: top;"><p style="margin:0; padding:0;">{{ $invoice_row->quantity }}</p>
 							@if ($invoice_row->refund)
-								<p style="font-size: 0.7rem;">{{ $invoice_row->refund }}</p>
+								<p style="font-size: 0.7rem; margin:0; padding: 0;">-{{ $invoice_row->refund }}</p>
 							@endif
 						</td>
-						<td><p>{{ $invoice_row->total }}</p>
-							@if ($invoice_row->discount && $invoice_row->discount !== '$0')
-								<p style="font-size: 0.7rem;">- {{ $invoice_row->discount_value }}</p>
-							@endif
-							@if ($invoice_row->refund)
-								<p style="font-size: 0.7rem;">- {{ $invoice_row->price * $invoice_row->refund }}</p>
-							@endif
+						<td style="vertical-align: top;"><p style="margin:0; padding:0;">{{ $invoice_row->total }}</p>
 						</td>
 					</tr>
 				@endforeach
