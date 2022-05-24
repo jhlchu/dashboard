@@ -10,6 +10,11 @@ class Customer extends Model
 {
     use HasFactory;
 
+	public function scopeWhenRequest($query, $parameter)
+	{
+		return $query->when(request($parameter), fn ($query) => $query->where($parameter, request($parameter)));
+	}
+
 	public function invoice() {
 		return $this->hasMany(Invoice::class,  'customer_id', 'id');
 	}

@@ -7,6 +7,7 @@
 - [ ] Create Invoice to redirect with notification
 - [ ] Pagination
 - [ ] with and withWhere query
+- [ ] Unicode fonts
 
 
 # Refresh

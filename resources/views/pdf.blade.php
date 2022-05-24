@@ -12,7 +12,7 @@
     {{-- <link type="text/css" rel="stylesheet" href="{{ public_path('/css/app.css') }}" /> --}}
     {{-- <link rel="stylesheet" href="{{ asset('css/pdf.css') }}" /> --}}
 
-    <title>{{ $invoice->invoice_number }} [{{ $invoice->user->name }}]({{ date('d-M-Y') }}).pdf</title>
+    <title>{{ $invoice->invoice_number }} [{{ $invoice->user->name }}] ({{ date('d-M-Y') }}).pdf</title>
     <style  data-cfasync="false" >
         @font-face {
             font-family: 'Segoe-UI';
@@ -170,8 +170,6 @@
             font-weight: 300;
         }
 
-
-
         .notes-area {
             border-left: 0.2rem gray solid;
             margin: 1rem;
@@ -242,8 +240,6 @@
             padding-right: 1.2rem;
             font-weight: 700
         }
-
-
 
         footer {
             position: fixed;

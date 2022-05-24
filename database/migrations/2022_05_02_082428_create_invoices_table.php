@@ -24,8 +24,8 @@ class CreateInvoicesTable extends Migration
 			$table->unsignedFloat('shipping_handling')->default(0.00);
 			$table->string('discount')->default('$0');
 			$table->timestamps();
-			$table->timestamp('completed_at')->nullable()->default(null);
-			$table->timestamp('paid_at')->nullable()->default(null);
+			$table->dateTime('completed_at')->nullable()->default(null);
+			$table->dateTime('paid_at')->nullable()->default(null);
         });
 	}
 

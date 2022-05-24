@@ -29,19 +29,21 @@ class Invoice extends Model
 	public function scopeFilter($query)
 	{
 		return $query->when(request('query'), function ($query) {
-			$query->where('invoice_number', request('query'))
-			->orWhere('notes', 'like', '%' . request('query') . '%')
-			->orWhere(function ($query) {
-				$query->joinSub(
-					InvoiceRow::where('description', 'like', '%' . request('query') . '%'),
-					'invoice_row',
-					fn ($join) => $join->on('id', '=', 'invoice_row.invoice_id')
-				);
-			});
-		})->whenRequest('salesperson_id')
-		->whenRequest('customer_id')
-		->whenRequest('company_id')
-		->whenRequest('status_id');
+			$query
+				->where('invoice_number', request('query'))
+				->orWhere('notes', 'like', '%' . request('query') . '%')
+				->orWhere(function ($query) {
+					$query->joinSub(
+						InvoiceRow::where('description', 'like', '%' . request('query') . '%'),
+						'invoice_row',
+						fn ($join) => $join->on('id', '=', 'invoice_row.invoice_id')
+					);
+				});
+		})
+			->whenRequest('salesperson_id')
+			->whenRequest('customer_id')
+			->whenRequest('company_id')
+			->whenRequest('status_id');
 	}
 
 	/*public function scopeFilter($query, array $filters) {

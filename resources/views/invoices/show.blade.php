@@ -44,7 +44,7 @@
 		</div>
 		<div class="my-1 md:my-3">
 			<div class="border-b-2 text-center font-bold">Date Paid</div>
-			<div class="text-center">{{ $invoice->completed_at ? FormatOutput::dateTimeFormat($invoice->paid_at) : '-' }}</div>
+			<div class="text-center">{{ $invoice->paid_at ? FormatOutput::dateTimeFormat($invoice->paid_at) : '-' }}</div>
 		</div>
 		<div class="my-1 md:my-3">
 			<div class="border-b-2 text-center font-bold">Date Updated</div>
