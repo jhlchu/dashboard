@@ -20,7 +20,7 @@
 
 		{{-- <script data-cfasync="false" src="{{ asset('js/tailwindcss-3.0.24.min.js') }}"></script> --}}
 		{{-- <script data-cfasync="false" src="{{ asset('js/flowbite-1.4.5.min.js') }}"></script> --}}
-		{{-- <script data-cfasync="false" src="{{ asset('js/alpinejs-3.10.2.min.js') }}" defer></script> --}}
+		<script data-cfasync="false" src="{{ asset('js/alpinejs-3.10.2.min.js') }}" defer></script>
 		{{-- <link rel="stylesheet" href="{{ asset('css/flowbite-1.4.5.min.css') }}" /> --}}
 
 		<script data-cfasync="false" src="{{ mix('js/app.js') }}"></script>
