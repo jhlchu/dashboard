@@ -28,7 +28,7 @@ class InvoiceFactory extends Factory
             'shipping_handling' => $this->faker->randomFloat($nbMaxDecimals = 2, $min = 0, $max = 100),
 			'discount'   => $hasDiscount ? ($discountSign === '$' ? $discountSign . $discountStringValue : $discountStringValue . $discountSign) : '$0',
             'completed_at'      => now(),
-            'paid_at'           => now()
+            //'paid_at'           => now()
         ];
 	}
 }

@@ -2,26 +2,26 @@
 
 use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\InvoiceController;
-use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ContractController;
+use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\FallbackController;
+use App\Http\Controllers\SettingsController;
 
 Route::get('/', fn() => view('index',[]) );
+Route::get('/calculator', fn () => view('calculator'));
 Route::get('/settings', [SettingsController::class, 'index'])->name('settings');
-Route::get('/calculator', fn() => view('calculator') );
 
-
-Route::post('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show.post');
 /* Route::post('/invoices/{invoice}', [InvoiceController::class, 'show_post'])->name('invoices.show_post'); */
+Route::post('/invoices/{invoice}', [InvoiceController::class, 'show'])->name('invoices.show.post');
 Route::post('/invoices/{invoice}/pdf', [InvoiceController::class, 'pdf'])->name('invoices.pdf');
-Route::resources([
-    'invoices'  => InvoiceController ::class,
-    'customers' => CustomerController::class,
-    'users'     => UserController    ::class,
-    'companies' => CompanyController ::class
+Route::resources(['invoices'  => InvoiceController::class,
+	'customers' => CustomerController::class,
+	'users'     => UserController::class,
+	'companies' => CompanyController::class,
+	'contracts' => ContractController::class
 ]);
 
 

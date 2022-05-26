@@ -12,7 +12,7 @@ class Invoice extends Model
     use HasFactory;
 
 	protected $fillable = [
-		'invoice_number', 'company_id', 'status_id', 'salesperson_id', 'customer_id', 'completed_at', 'paid_at'
+		'invoice_number', 'company_id', 'status_id', 'salesperson_id', 'customer_id', 'completed_at'
 	];
 
 	public function status      () { return $this->belongsTo (Status     ::class, 'status_id'     ); }

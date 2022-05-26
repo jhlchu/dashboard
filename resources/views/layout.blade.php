@@ -71,6 +71,9 @@
 							<a href="{{ route('customers.index') }}" class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('customers.*') ? ' text-yellow-300 md:p-0' : 'text-white md:p-0 hover:text-yellow-200' }}">Customers</a>
 						</li>
 						<li>
+							<a href="{{ route('contracts.index') }}" class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('contracts.*') ? ' text-yellow-300 md:p-0' : 'text-white md:p-0 hover:text-yellow-200' }}">Contracts</a>
+						</li>
+						<li>
 							<a href="{{ route('settings') }}"  class="block py-2 pr-4 pl-3 {{ Route::currentRouteNamed('settings') ? ' text-yellow-300 md:p-0' : 'text-white md:p-0 hover:text-yellow-200' }}">Settings</a>
 						</li>
 					</ul>

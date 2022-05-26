@@ -45,14 +45,13 @@ class InvoiceController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function create()
-    {
-		
+	{
         return view('invoices.create', [
 			'companies'   => Company::all(),
 			'tax_regions' => TaxRegion::all(),
 			'salespeople' => User::all(),
 			'customers'   => Customer::all(),
-			'statuses' => Status::whereIn('name', ['Draft', 'Completed', 'Paid'])->get(),
+			'statuses' => Status::whereIn('name', ['Draft', 'Completed'])->get(),
 			'taxes' => TaxRegion::with('tax')->get()
 		]);
     }
@@ -99,15 +98,13 @@ class InvoiceController extends Controller
 			'*.discount'    => 'string|nullable',
 			'*.quantity'    => 'required|string'
 		]);
-		
-		
+
 		if ($validator->fails()) {
 			return redirect()
 				->route('invoices.create')
 				->withErrors($validator, 'cart')
 				->withInput();
 		}
-
 
 		//Create Customer
 		$customers = Customer::where(function ($query) {
@@ -170,10 +167,10 @@ class InvoiceController extends Controller
 		if (Status::find(request('status_id'))->name === 'Completed') {
 			$invoice->completed_at = now();
 		}
-		if (Status::find(request('status_id'))->name === 'Paid') {
+		/* if (Status::find(request('status_id'))->name === 'Paid') {
 			$invoice->completed_at = now();
 			$invoice->paid_at = now();
-		}
+		} */
 		//dd($invoice);
 		$invoice->save();
 		$invoice->refresh();

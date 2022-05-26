@@ -280,7 +280,7 @@
 <body>
     <header>
         <div class='header-content'>
-            <img src="https://www.element-acoustics.com/wp-content/uploads/2022/05/Element_BigE_Logo.png" style="margin-top: 0.5rem;" />
+            <img src="https://www.element-acoustics.com/wp-content/uploads/2022/05/Element_BigE_Logo.png" />
             <div>
                 <p><span>INVOICE</span><span>{{ $invoice->invoice_number }}</span></p>
                 <table>
@@ -292,7 +292,7 @@
                         <td>Sales</td>
                         <td>{{ $invoice->user->name }}</td>
                     </tr>
-					@if ($invoice->status->name === 'Paid' || 'Deleted' || 'Draft')
+					@if ($invoice->status->name === 'Deleted' || 'Draft')
 						<tr>
 							<td>Status</td>
 							<td>{{ $invoice->status->name }}</td>

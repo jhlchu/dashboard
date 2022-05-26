@@ -25,7 +25,7 @@ class CreateInvoicesTable extends Migration
 			$table->string('discount')->default('$0');
 			$table->timestamps();
 			$table->dateTime('completed_at')->nullable()->default(null);
-			$table->dateTime('paid_at')->nullable()->default(null);
+			//$table->dateTime('paid_at')->nullable()->default(null);
         });
 	}
 

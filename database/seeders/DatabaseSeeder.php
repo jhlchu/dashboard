@@ -165,7 +165,7 @@ class DatabaseSeeder extends Seeder
 
 		Status::create(['name' => 'Draft', 'color' => 'gray', 'icon' => 'draft']);
 		Status::create(['name' => 'Completed', 'color' => 'blue', 'icon' => 'done']);
-		Status::create(['name' => 'Paid', 'color' => 'green', 'icon' => 'price_check']);
+		//Status::create(['name' => 'Paid', 'color' => 'green', 'icon' => 'price_check']);
 		Status::create(['name' => 'Deleted', 'color' => 'red', 'icon' => 'delete_forever']);
 		Status::create(['name' => 'Refunded', 'color' => 'purple', 'icon' => 'currency_exchange']);
 
