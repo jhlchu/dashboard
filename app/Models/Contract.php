@@ -24,7 +24,7 @@ class Contract extends Model
 		];
 	}
 
-	public function getPaymentPercentAttribute()
+	public function getPaymentPercentsAttribute()
 	{
 		return (object) [
 			'payment_1_deposit'      => $this->paymentToString($this->payment_1_deposit) . '%',

@@ -15,7 +15,7 @@ return new class extends Migration
 	{
 		Schema::create('contracts', function (Blueprint $table) {
 			$table->increments('id');
-			$table->enum('type', ['residential', 'commerical', 'government'])->default('residential');
+			$table->enum('type', ['residential', 'commercial', 'government'])->default('residential');
 			$table->unsignedFloat('total');
 			$table->unsignedFloat('payment_1_deposit')->default(0.3);
 			$table->unsignedFloat('payment_2_purchasing')->default(0.4);

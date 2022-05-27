@@ -12,7 +12,9 @@ class Customer extends Model
 
 	public function scopeWhenRequest($query, $parameter)
 	{
-		return $query->when(request($parameter), fn ($query) => $query->where($parameter, request($parameter)));
+		return $query->when(request($parameter), function ($query, $value) use ($parameter) {
+			$query->where($parameter, $value);
+		});
 	}
 
 	public function invoice() {

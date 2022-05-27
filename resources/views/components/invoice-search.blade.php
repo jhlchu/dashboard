@@ -19,7 +19,7 @@
 	<div class="flex flex-row justify-between">
 		<div class="flex flex-col mx-2 flex-grow">
 			<label for="salesperson" class="mb-2 block text-sm font-medium text-gray-900">Salesperson</label>
-			<select id="salesperson" name="salesperson"
+			<select id="salesperson" name="salesperson_id"
 				class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
 				{{-- <option selected>Choose a country</option> --}}
 				<option value="">-</option>
@@ -31,7 +31,7 @@
 		</div>
 		<div class="flex flex-col mx-2 flex-grow">
 			<label for="company" class="mb-2 block text-sm font-medium text-gray-900">Company</label>
-			<select id="company" name="company"
+			<select id="company" name="company_id"
 				class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
 				<option value="">-</option>
 				@foreach ($companies as $company)
@@ -42,7 +42,7 @@
 		</div>
 		<div class="flex flex-col mx-2 flex-grow">
 			<label for="customer" class="mb-2 block text-sm font-medium text-gray-900">Customer</label>
-			<select id="customer" name="customer"
+			<select id="customer" name="customer_id"
 				class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
 				<option value="">-</option>
 				@foreach ($customers as $customer)
@@ -53,7 +53,7 @@
 		</div>
 		<div class="flex flex-col mx-2 flex-grow">
 			<label for="status" class="mb-2 block text-sm font-medium text-gray-900">Status</label>
-			<select id="status" name="status"
+			<select id="status" name="status_id"
 				class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-2.5 text-sm text-gray-900 focus:border-blue-500 focus:ring-blue-500">
 				<option value="">-</option>
 				@foreach ($statuses as $status)
